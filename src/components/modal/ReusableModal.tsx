@@ -3,7 +3,7 @@ import { Modal, Button } from '@mantine/core';
 import AddQuestion from '../../pages/question/AddQuestion';
 
 
-const ReusableModal = ({content,title}:any) => {
+const ReusableModal = ({title}:any) => {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (

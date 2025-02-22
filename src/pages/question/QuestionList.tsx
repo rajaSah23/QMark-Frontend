@@ -1,13 +1,13 @@
 import { Grid, Loader, SegmentedControl } from '@mantine/core';
 import McqCard from '../../components/cards/MCQCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AppDispatch } from '../../store';
 import ReusableModal from '../../components/modal/ReusableModal';
-import AddQuestion from './AddQuestion';
+// import AddQuestion from './AddQuestion';
 import { getQuestion } from '../../store/action/question-action';
 import { useSearchParams } from 'react-router-dom';
-import { toast } from '../../../utils/APIClient';
+// import { toast } from '../../../utils/APIClient';
 
 const QuestionList = () => {
     const dispatch = useDispatch<AppDispatch>();  // ✅ Typed dispatch

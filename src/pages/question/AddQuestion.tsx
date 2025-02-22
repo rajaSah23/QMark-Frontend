@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/form';
-import { TextInput, Button, Textarea, Radio, SegmentedControl, Select, TagsInput } from '@mantine/core';
+import { TextInput, Button, Radio, SegmentedControl, TagsInput } from '@mantine/core';
 import * as yup from 'yup';
 import { yupResolver } from '@mantine/form';
 import { useState } from 'react';
@@ -53,7 +53,7 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
             tag: [] as any[],
         },
         validate: yupResolver(schema),
-        onValuesChange(values, previous) {
+        onValuesChange() {
             form.validate();
         },
     });
@@ -236,7 +236,7 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
                 error={form.errors.explanation}
             /> */}
             <p>Explanation</p>
-            <TextEditor value={form.getValues().explanation} onChange={({ html, text }) => form.setValues({ explanation: html })} />
+            <TextEditor value={form.getValues().explanation} onChange={({ html }) => form.setValues({ explanation: html })} />
 
             <Button
                 type="submit"
