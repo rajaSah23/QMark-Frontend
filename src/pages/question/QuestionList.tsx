@@ -40,7 +40,7 @@ const QuestionList = () => {
     )
 
     return (
-        <div className="space-y-6 p-10">
+        <div className="space-y-6 p-0">
             
             <div className=' flex justify-between items-center'>
                 <ReusableModal title={getTitle()}/>
