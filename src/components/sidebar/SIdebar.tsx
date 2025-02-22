@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const Sidebar = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   const subjectQuery = searchParams.get("subject") || "all";
   const topicQuery = searchParams.get("topic") || "other";

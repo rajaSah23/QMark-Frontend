@@ -1,5 +1,4 @@
 import { Skeleton } from '@mantine/core'
-import React from 'react'
 
 const MCQShimmer = () => {
   return (
