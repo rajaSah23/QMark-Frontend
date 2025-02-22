@@ -1,10 +1,9 @@
 import axios from 'axios'
 import { notifications } from '@mantine/notifications';
- import {CREDS} from '../utils/creds'
 
 
 const client = axios.create({
-        baseURL: CREDS.getBackendBaseURL()
+        baseURL: import.meta.env.VITE_BACKEND_BASE_URL
     }, 
     // {
     // withCredentials: true,
