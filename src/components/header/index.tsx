@@ -15,7 +15,7 @@ const Header = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="text-2xl md:text-4xl font-bold text-bright-sun-400">
-            <span className="text-white">The </span> Q<span className="text-white">Mark</span>
+            <span className="text-white"> </span> Q<span className="text-white">Mark</span>
           </div>
         </div>
 
@@ -26,9 +26,9 @@ const Header = () => {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          <button className="border px-3 py-1 rounded-full bg-mine-shaft-800">
+          {/* <button className="border px-3 py-1 rounded-full bg-mine-shaft-800">
             Dark Mode
-          </button>
+          </button> */}
           <div
             onClick={() => navigate('/profile')}
             className="flex items-center gap-1 hover:cursor-pointer"

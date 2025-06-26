@@ -55,9 +55,9 @@ export function FooterLinks() {
     <footer className="pt-16 pb-16 bg-mine-shaft-950  border-mine-shaft-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-start">
         <div className="max-w-[200px] mb-8 sm:mb-0">
-          <h2 className="text-4xl font-bold ">The <span className='text-bright-sun-400'> Q </span> Mark</h2>
+          <h2 className="text-4xl font-bold "> <span className='text-bright-sun-400'> Q </span> Mark</h2>
           <p className="mt-1 text-xs text-mine-shaft-400 text-center sm:text-left">
-            Build fully functional accessible web applications faster than ever
+            Save important MCQs. Revise efficiently. Master your exams with ease.
           </p>
         </div>
         <div className="flex flex-wrap gap-8 sm:gap-16">{groups}</div>

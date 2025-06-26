@@ -16,7 +16,7 @@ const RatingCard = ({ name = "", ratingValue = 5 }) => {
           </div>
         </div>
         <div className="text-[10px]">
-          This job portal made job search easy and quick. Recommended to all job seekers!
+          This portal made student's life easy. Recommended to all aspirants seekers!
         </div>
       </div>
     </div>
