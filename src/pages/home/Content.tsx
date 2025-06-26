@@ -44,7 +44,7 @@ const Content = () => {
       {/* Right Image */}
       <div className="w-full lg:w-1/2 flex justify-center">
         <img
-          src="/public/banner-image.png"
+          src="/banner-image.png"
           alt="Banner"
           className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
         />

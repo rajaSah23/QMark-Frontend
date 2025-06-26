@@ -15,7 +15,7 @@ const HowItWorks = () => {
             <div className="flex flex-col md:flex-row justify-between items-center w-full pt-10 gap-10">
                 {/* Left: Image */}
                 <div className="w-full md:w-1/2 flex justify-center">
-                    <img src="/public/man-with-laptop.png" alt="character" className="w-full max-w-md scale-x-[-1]" />
+                    <img src="/man-with-laptop.png" alt="character" className="w-full max-w-md scale-x-[-1]" />
                 </div>
                 {/* Right: Steps */}
                 <div className="flex flex-col justify-center items-start gap-6 w-full md:w-1/2">
