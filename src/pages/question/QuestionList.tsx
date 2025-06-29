@@ -65,7 +65,7 @@ const QuestionList = () => {
                         <McqCard
                             qId={idx + 1}
                             question={mcq}
-                            isSaved={true}
+                            // isSaved={true}
                             onToggleSave={() => { }}
                         />
                     </Grid.Col>

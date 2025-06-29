@@ -8,7 +8,7 @@ const HomePage = () => {
   return (
     <div className='bg-mine-shaft-950 min-h-screen font-["poppins"]'>
         <Content/>
-        <AutoCarousel/>
+        {/* <AutoCarousel/> */}
         {/* <BrowseCategoryComponent/> */}
         <HowItWorks/>
         <Feedbacks/>
