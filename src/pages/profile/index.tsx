@@ -1,17 +1,40 @@
+import { Button } from "@mantine/core";
+import { getUserData } from "../../../utils/Utility";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+
 const ViewProfile = () => {
+  // const userdata = getUserData();
+  const navigate = useNavigate()
+
+  const {userData, loading } = useSelector((store: any) => store.user)
+
+  const handleLogOut = () => {
+    localStorage.clear();
+
+    // ✅ Dispatch custom event so the same-tab component updates
+    window.dispatchEvent(new Event("local-storage")); // trigger same-tab update
+    navigate("/")
+
+  };
+
   return (
     <div className="min-h-screen bg-mine-shaft-950 p-6">
       <div className="mx-auto rounded-md p-6">
         {/* Profile Header */}
         <div className="flex flex-col items-center md:flex-row md:items-center">
           <div className="w-24 h-24 bg-bright-sun-500 rounded-full flex items-center justify-center text-mine-shaft-900 text-3xl font-bold hover:cursor-pointer">
-            A
+            {userData?.name?.toString().toUpperCase()?.charAt(0)}
           </div>
           <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left">
-            <h1 className="text-2xl font-bold text-bright-sun-50">Raja Sah</h1>
-            <p className="text-mine-shaft-300">raja@gmail.com</p>
+            <h1 className="text-2xl font-bold text-bright-sun-50">{userData?.name}</h1>
+            <p className="text-mine-shaft-300">{userData?.email}</p>
           </div>
         </div>
+
+        <Button onClick={() => handleLogOut()}>LogOut</Button>
 
         {/* About Me Section */}
         <div className="mt-6">

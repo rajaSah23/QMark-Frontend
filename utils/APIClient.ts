@@ -27,6 +27,8 @@ export const reCapchaMatching = async (value:any) => {
 export const toast = {
     success:(title:String,message="")=>{
         notifications.show({
+            position: 'top-right',
+            color:"green",
             title: title,
             message: message,
           })

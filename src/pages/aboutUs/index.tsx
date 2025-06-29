@@ -70,7 +70,7 @@ const AboutUs = () => {
               {/* Team Member Cards */}
               <div className="text-center p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
                 <div className="w-20 h-20 mx-auto bg-bright-sun-400 rounded-full mb-3"></div>
-                <h3 className="text-lg font-bold text-bright-sun-50">Raja Kumar</h3>
+                <h3 className="text-lg font-bold text-bright-sun-50">Raja Sah</h3>
                 <p className="text-mine-shaft-300">Founder & Developer</p>
               </div>
               <div className="text-center p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">

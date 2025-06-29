@@ -3,7 +3,7 @@ import './App.css'
 import '@mantine/core/styles.css';
 import HomePage from './pages/home'
 import { createTheme, MantineProvider } from '@mantine/core'
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import AboutUs from './pages/aboutUs';
 import Header from './components/header';
 import FooterLinks from './pages/home/Footer';
@@ -17,6 +17,9 @@ import { Questions } from './pages/question/index.tsx';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import '@mantine/tiptap/styles.css';
+import LoginPage from './pages/auth/LoginPage.tsx';
+import RegisterPage from './pages/auth/RegisterPage.tsx';
+import OtpVerifyPage from './pages/auth/OtpVerifyPage.tsx';
 // require('dotenv').config();
 
 
@@ -34,35 +37,61 @@ function App() {
   return (
     <>
       <Provider store={store}>
-      <MantineProvider defaultColorScheme='dark' theme={theme}>
-      <Notifications />
-      
-
-        <BrowserRouter>
-        <Header/>
-          <Routes>
-            <Route path='/profile' element={<ViewProfile />}/>
-
-            
-            <Route path='/questions' element={<Questions />}/>
-
-            <Route path='/find-jobs' element={<FindJobs />}/>
-            <Route path='/job-detail' element={<JobDetail />}/>
-            <Route path='/job-apply' element={<ApplyNowForm />}/>
-
-            <Route path='/about' element={<AboutUs />}/>
-            {/* <Route path='/test' element={<Sidebar />}/> */}
-            <Route path='*' element={<HomePage />}/>
-            {/* <Route path='*' element={<HomePage />}/> */}
-          </Routes>
-          <FooterLinks/>
-        </BrowserRouter>
+        <MantineProvider defaultColorScheme='dark' theme={theme}>
+          <Notifications />
 
 
-      </MantineProvider>
+          <BrowserRouter>
+            <Header />
+            <Routes>
+
+              {/* ✅ Protected Routes Wrapper */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profile" element={<ViewProfile />} />
+                <Route path="/questions" element={<Questions />} />
+              </Route>
+
+              {/* Public Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/verify-otp" element={<OtpVerifyPage />} />
+
+
+              <Route path='/profile' element={<ViewProfile />} />
+
+
+              <Route path='/questions' element={<Questions />} />
+
+              <Route path='/find-jobs' element={<FindJobs />} />
+              <Route path='/job-detail' element={<JobDetail />} />
+              <Route path='/job-apply' element={<ApplyNowForm />} />
+
+              <Route path='/about' element={<AboutUs />} />
+              {/* <Route path='/test' element={<Sidebar />}/> */}
+              <Route path='*' element={<HomePage />} />
+              {/* <Route path='*' element={<HomePage />}/> */}
+            </Routes>
+            <FooterLinks />
+          </BrowserRouter>
+
+
+        </MantineProvider>
       </Provider>
     </>
   )
 }
+
+
+
+const ProtectedRoute = () => {
+  const userData = localStorage.getItem("userData");
+
+  if (!userData) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
+};
+
 
 export default App
