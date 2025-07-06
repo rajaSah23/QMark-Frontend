@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { getSubjectList, getTopicList } from '../../store/action/master-action';
 import { AppDispatch } from '../../store';
+import { IconEdit } from '@tabler/icons-react';
 
 const Sidebar = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
   const { subjectList, topicList } = useSelector((state: any) => state.master);
 
   const [searchParams] = useSearchParams();
@@ -33,7 +36,7 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 h-full bg-mine-shaft-950 text-white p-4 overflow-y-auto">
-      <h2 className="text-xl font-semibold mb-4">Subjects</h2>
+      <h2 className="text-xl font-semibold mb-4 flex gap-1 items-center">Subjects <span className='cursor-pointer' onClick={()=>navigate("/profile#master-settings")}><IconEdit/></span></h2>
       <ul>
         {subjectList?.map((subject: any) => {
           const isExpanded = expandedSubjects[subject._id] || false;

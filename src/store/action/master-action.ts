@@ -24,6 +24,16 @@ export const getSubjectList = createAsyncThunk("getSubjectList", async (params, 
         rejectWithValue("Data not found");
     }
 })
+export const deleteSubject = createAsyncThunk("deleteSubject", async (subjectId:any, { rejectWithValue }) => {    
+    try {
+        const response = await apiClient.DELETE(`/master/subject/${subjectId}`);
+        
+        return response.data?.data;
+    } catch (error) {
+        console.log(error);
+        rejectWithValue("Data not found");
+    }
+})
 
 export const getTopicList = createAsyncThunk("getTopicList", async (subjectId:any, { rejectWithValue }) => {    
     try {

@@ -1,15 +1,101 @@
-import { Button } from "@mantine/core";
+import { Badge, Button, Card, Group, ScrollArea, Text, Title } from "@mantine/core";
 import { getUserData } from "../../../utils/Utility";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AppDispatch } from "../../store";
+import { deleteSubject, getSubjectList } from "../../store/action/master-action";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
 
+const MasterSettings = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { subjectList } = useSelector((state: any) => state.master);
+  const location = useLocation();
 
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        // Scroll after the DOM is painted
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth" });
+        }, 0);
+      }
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (!subjectList || subjectList.length === 0) {
+      dispatch(getSubjectList());
+    }
+  }, [dispatch, subjectList]);
+
+  const handleDelete = (subjectId: string) => {
+
+    dispatch(deleteSubject(subjectId));
+
+  };
+
+  const handleEdit = (subject: any) => {
+    // You can pass subject data to open a modal for editing
+    console.log('Edit subject:', subject);
+    // Example: openSubjectEditModal(subject);
+  };
+
+  return (
+    <div className="p-6" >
+      <Title order={3} mb={20}>
+        Master Settings – Subject List
+      </Title>
+
+      <ScrollArea h={400}>
+        {subjectList?.length > 0 ? (
+          subjectList.map((subject: any) => (
+            <Card key={subject._id} shadow="xs" padding="md" mb={12} withBorder>
+              <div className="flex justify-between items-center">
+                <div>
+                  <Text fw={600}>{subject.subject}</Text>
+                  <Text size="sm" c="dimmed">
+                    Created At: {subject.createdAt}
+                  </Text>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Group gap={4}>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      leftSection={<IconEdit size={14} />}
+                      onClick={() => handleEdit(subject)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="xs"
+                      color="red"
+                      variant="light"
+                      leftSection={<IconTrash size={14} />}
+                      onClick={() => handleDelete(subject._id)}
+                    >
+                      Delete
+                    </Button>
+                  </Group>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Text>No subjects found.</Text>
+        )}
+      </ScrollArea>
+    </div>
+  );
+};
 const ViewProfile = () => {
   // const userdata = getUserData();
   const navigate = useNavigate()
 
-  const {userData, loading } = useSelector((store: any) => store.user)
+  const { userData, loading } = useSelector((store: any) => store.user)
 
   const handleLogOut = () => {
     localStorage.clear();
@@ -86,6 +172,10 @@ const ViewProfile = () => {
           </button>
         </div>
       </div>
+      <section id="master-settings">
+
+        <MasterSettings />
+      </section>
     </div>
   );
 };

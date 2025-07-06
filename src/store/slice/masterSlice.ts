@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { addSubject, getSubjectList, getTopicList } from "../action/master-action"
+import { addSubject, deleteSubject, getSubjectList, getTopicList } from "../action/master-action"
 
 
 
@@ -32,6 +32,14 @@ export const MasterSlice = createSlice({
         }).addCase(getSubjectList.fulfilled,(state,action)=>{
             state.subjectList = action.payload;
         }).addCase(getSubjectList.rejected,(state,action)=>{
+            state = initialState
+        })
+
+        builder.addCase(deleteSubject.pending,(state,action)=>{
+        }).addCase(deleteSubject.fulfilled,(state,action)=>{
+            const filteredSubjects = state.subjectList.filter((subject:any)=> subject._id !== action.payload?._id);
+            state.subjectList = filteredSubjects;
+        }).addCase(deleteSubject.rejected,(state,action)=>{
             state = initialState
         })
 

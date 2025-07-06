@@ -233,7 +233,7 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
                         variant="outline"
                         className="mt-2"
                         size="sm"
-                        disabled={form.values.options.length >= 4}
+                        disabled={form.values.options.length >= 5}
                     >
                         Add Option
                     </Button>
