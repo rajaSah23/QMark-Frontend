@@ -41,12 +41,12 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange, s
         label: subject.subject,
         value: subject._id,
       }
-    })
+    }) || []
     // subjects.push({
     //   label: 'Other',
     //   value: 'other'
     // })
-    subjects.push({
+    subjects?.push({
       label: '+ Add Subject',
       value: 'add-subject'
     })
