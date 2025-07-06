@@ -57,7 +57,7 @@ const MasterSettings = () => {
                 <div>
                   <Text fw={600}>{subject.subject}</Text>
                   <Text size="sm" c="dimmed">
-                    Created At: {subject.createdAt}
+                    Created At: {subject.createdAt ? new Date(subject.createdAt).toLocaleDateString() : "N/A"}
                   </Text>
                 </div>
                 <div className="flex gap-2 items-center">

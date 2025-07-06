@@ -11,7 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 
 const QuestionList = () => {
     const dispatch = useDispatch<AppDispatch>();  // ✅ Typed dispatch
-    const { data, loading } = useSelector((state: any) => state.questions);
+    const { data, loading, total,page,totalPages } = useSelector((state: any) => state.questions);
     const [searchParams, setSearchParams] = useSearchParams()
     // console.log(searchParams.get("subject"));
     const difficulty = searchParams.get("difficulty") || "easy";
@@ -44,6 +44,11 @@ const QuestionList = () => {
             
             <div className=' flex justify-between items-center'>
                 <ReusableModal title={getTitle()}/>
+                {/* Total question and pages */}
+                <div className='text-bright-sun-400 text-sm'>
+                    Total : {total} | Pages: {page} out of {totalPages}
+                </div>
+
                 <SegmentedControl
                     size="xs"
                     radius="xl"
