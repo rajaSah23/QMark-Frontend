@@ -1,113 +1,94 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useSearchParams } from 'react-router-dom';
+import { getSubjectList, getTopicList } from '../../store/action/master-action';
+import { AppDispatch } from '../../store';
 
 const Sidebar = () => {
-  const [searchParams] = useSearchParams()
+  const dispatch = useDispatch<AppDispatch>();
+  const { subjectList, topicList } = useSelector((state: any) => state.master);
 
-  const subjectQuery = searchParams.get("subject") || "all";
-  const topicQuery = searchParams.get("topic") || "other";
-console.log(subjectQuery);
+  const [searchParams] = useSearchParams();
+  const subjectQuery = searchParams.get('subject') || 'all';
+  const topicQuery = searchParams.get('topic') || '';
 
-  // List of subjects with child topics
-  const subjects = [
-    {
-      name: 'All',
-      slug: 'all',
-    },
-    {
-      name: 'Computer Network',
-      slug: 'computer-network',
-      children: [
-        { name: 'OSI Model', slug: 'osi-model' },
-        { name: 'TCP/IP', slug: 'tcp-ip' },
-      ],
-    },
-    {
-      name: 'DBMS',
-      slug: 'dbms',
-      children: [
-        { name: 'SQL', slug: 'sql' },
-        { name: 'NoSQL', slug: 'nosql' },
-      ],
-    },
-    {
-      name: 'Operating System',
-      slug: 'operating-system',
-      children: [
-        { name: 'Process Management', slug: 'process-management' },
-        { name: 'Memory Management', slug: 'memory-management' },
-      ],
-    },
-    {
-      name: 'Data Structures',
-      slug: 'data-structures',
-      children: [
-        { name: 'Arrays', slug: 'arrays' },
-        { name: 'Linked Lists', slug: 'linked-lists' },
-      ],
-    },
-  ];
+  const [expandedSubjects, setExpandedSubjects] = useState<{ [key: string]: boolean }>({});
 
-  // State to keep track of which subject is expanded
-  const [expandedSubjects, setExpandedSubjects] = useState([]);
+  useEffect(() => {
+    dispatch(getSubjectList());
+  }, [dispatch]);
 
-  const toggleSubject = (slug: any) => {
-    setExpandedSubjects((prev: any) => ({
+  useEffect(() => {
+    if (subjectQuery && subjectQuery !== 'all') {
+      dispatch(getTopicList(subjectQuery));
+    }
+  }, [dispatch, subjectQuery]);
+
+  const toggleSubject = (subjectId: string) => {
+    setExpandedSubjects((prev) => ({
       ...prev,
-      [slug]: !prev[slug],
+      [subjectId]: !prev[subjectId],
     }));
   };
 
   return (
-    <aside className="w-64 h-full bg-mine-shaft-950 text-white p-4">
+    <aside className="w-64 h-full bg-mine-shaft-950 text-white p-4 overflow-y-auto">
       <h2 className="text-xl font-semibold mb-4">Subjects</h2>
       <ul>
-        {subjects?.map((subject: any) => (
-          <li key={subject.slug} className={`mb-2  ${subject?.slug === subjectQuery && "bg-mine-shaft-800  rounded-sm"}`}>
-            <div className={`flex items-center justify-between ${(subjectQuery==null || subject?.slug === subjectQuery )&& "text-bright-sun-400"}`}>
-              {/* Subject Link */}
-              <Link
-                to={`?subject=${subject.slug}`}
-                className="block px-2 py-1 rounded hover:bg-mine-shaft-800 transition-colors flex-1"
-              >
-                {subject.name}
-              </Link>
-              {/* Toggle Button for Child Topics */}
-              {subject.children && subject.children.length > 0 && (
-                <button
-                  onClick={() => toggleSubject(subject.slug)}
-                  className="p-1 focus:outline-none"
+        {subjectList?.map((subject: any) => {
+          const isExpanded = expandedSubjects[subject._id] || false;
+          const isSelected = subject._id === subjectQuery;
+
+          return (
+            <li key={subject._id} className={`mb-2 ${isSelected ? 'bg-mine-shaft-800 rounded-sm' : ''}`}>
+              <div className="flex items-center justify-between">
+                <Link
+                  to={`?subject=${subject._id}`}
+                  className={`block px-2 py-1 rounded flex-1 transition-colors ${isSelected ? 'text-bright-sun-400' : 'hover:bg-mine-shaft-800'}`}
                 >
-                  <svg
-                    className={`h-4 w-4 transform transition-transform duration-200 ${expandedSubjects[subject.slug] ? 'rotate-90' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                  {subject.subject}
+                </Link>
+
+                {/* Show toggle button if subject is selected and topicList is available */}
+                {isSelected && topicList?.length > 0 && (
+                  <button
+                    onClick={() => toggleSubject(subject._id)}
+                    className="p-1 focus:outline-none"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
-            </div>
-            {/* Render Child Topics if Expanded */}
-            {expandedSubjects[subject.slug] && subject.children && (
-              <ul className="ml-4 mt-1 ">
-                {subject.children.map((child: any) => (
-                  <li key={child.slug} className={`mb-1 ${child?.slug === topicQuery && "bg-mine-shaft-950 rounded-l-xl"}`}>
-                    <Link
-                      to={`?subject=${subject.slug}&topic=${child.slug}`}
-                      className="block px-2 py-1 rounded transition-colors text-sm"
+                    <svg
+                      className={`h-4 w-4 transform transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {child.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Show topic list if subject is expanded and selected */}
+              {isExpanded && isSelected && topicList?.length > 0 && (
+                <ul className="ml-4 mt-1">
+                  {topicList.map((topic: any) => (
+                    <li
+                      key={topic._id}
+                      className={`mb-1 ${topic._id === topicQuery ? 'bg-mine-shaft-950 rounded-l-xl' : ''}`}
+                    >
+                      <Link
+                        to={`?subject=${subject._id}&topic=${topic._id}`}
+                        className="block px-2 py-1 text-sm transition-colors"
+                      >
+                        {topic.topic}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </aside>
   );

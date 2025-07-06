@@ -1,18 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Select } from '@mantine/core';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../store';
+import { getSubjectList, getTopicList } from '../../store/action/master-action';
 
 interface SubjectTopicDropdownProps {
   onChange: (subject: any, topic: any) => void;
-  subjectError:any,
-  topicError:any
+  subjectError: any,
+  topicError: any,
+  openSubjectForm: () => void
 }
 
-const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,subjectError,topicError }) => {
+const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange, subjectError, topicError, openSubjectForm }) => {
+  const dispatch = useDispatch<AppDispatch>(); // Typed dispatch
+
+  const { subjectList,topicList } = useSelector((state: any) => state.master);
+
+  console.log("Master subjectList", subjectList);
+  console.log("Master topicList", topicList);
+
   const [subjectData, setSubjectData] = useState<any[]>([]);
+  const [topicData, setTopicData] = useState<any[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<any>('');
   const [selectedTopic, setSelectedTopic] = useState<any>('');
 
   // Simulate API call to fetch subjects and topics
+  useEffect(() => {
+    dispatch(getSubjectList())
+  }, [])
+  console.log("selectedSubject",selectedSubject);
+  console.log("selectedTopics",selectedTopic);
+
+  useEffect(() => {
+   if(selectedSubject) dispatch(getTopicList(selectedSubject));
+  }, [selectedSubject])
+
+  useEffect(() => {
+    let subjects = subjectList?.map((subject:any)=>{
+      return {
+        label: subject.subject,
+        value: subject._id,
+      }
+    })
+    // subjects.push({
+    //   label: 'Other',
+    //   value: 'other'
+    // })
+    subjects.push({
+      label: '+ Add Subject',
+      value: 'add-subject'
+    })
+    setSubjectData(subjects || [])
+  }, [subjectList])
+
+  useEffect(() => {
+    const topics = topicList?.map((topic:any)=>{
+      return {
+        label: topic.topic,
+        value: topic._id,
+        slug: topic.slug
+      }
+    })
+    console.log("topics",topics);
+    setTopicData(topics || []);
+  }, [topicList])
+
+
   useEffect(() => {
     const fetchSubjects = async () => {
       // Simulated API response
@@ -60,6 +113,11 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,su
             { name: 'Other', slug: 'other' },
           ],
         },
+        {
+          name: '+ Add Subject',
+          slug: 'add-subject',
+          topics: [],
+        },
       ];
 
       // Simulate API delay
@@ -68,7 +126,7 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,su
       }, 500);
     };
 
-    fetchSubjects();
+    // fetchSubjects();
   }, []);
 
   // Map subject data to options for the Subject Select
@@ -83,17 +141,27 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,su
   );
 
   // Map current subject topics to options for the Topic Select
-  const topicOptions = currentSubject
-    ? currentSubject.topics.map((topic: any) => ({
-        value: topic.slug,
-        label: topic.name,
-      }))
-    : [];
+  // const topicOptions = currentSubject
+  //   ? currentSubject.topics.map((topic: any) => ({
+  //     value: topic.slug,
+  //     label: topic.name,
+  //   }))
+  //   : [];
+  const topicOptions = topicList?.map((topic: any) => ({
+      value: topic.slug,
+      label: topic.topic,
+    }))
 
   // When either selection changes, trigger onChange callback
   const handleSubjectChange = (value: any) => {
-    setSelectedSubject(value);
+    console.log("handleSubjectChange",value);
+    
+    if (value === 'add-subject') {
+      openSubjectForm();
+      return
+    }
     setSelectedTopic(''); // Reset topic when subject changes
+    setSelectedSubject(value);
     onChange(value, ''); // update parent form state
   };
 
@@ -106,7 +174,7 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,su
     <div className='flex justify-center items-center gap-2 flex-wrap'>
       <Select
         placeholder="Select a subject"
-        data={subjectOptions}
+        data={subjectData}
         value={selectedSubject}
         onChange={handleSubjectChange}
         searchable
@@ -115,10 +183,10 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange,su
       <Select
         // mt="md"
         placeholder="Select a topic"
-        data={topicOptions}
-        value={selectedTopic}
+        data={topicData||[]}
+        value={selectedTopic||null}
         onChange={handleTopicChange}
-        disabled={!selectedSubject}
+        disabled={topicData?.length==0 || !selectedSubject}
         error={topicError}
       />
     </div>

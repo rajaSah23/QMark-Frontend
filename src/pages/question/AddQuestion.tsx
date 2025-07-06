@@ -1,14 +1,17 @@
 import { useForm } from '@mantine/form';
-import { TextInput, Button, Radio, SegmentedControl, TagsInput } from '@mantine/core';
+import { TextInput, Button, Radio, SegmentedControl, TagsInput, Modal } from '@mantine/core';
 import * as yup from 'yup';
 import { yupResolver } from '@mantine/form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { postQuestion } from '../../store/action/question-action';
 import { AppDispatch } from '../../store';
 import SubjectTopicDropdown from '../../components/dropdown';
 import { toast } from '../../../utils/APIClient';
 import TextEditor from '../../components/textEditor/TextEditor';
+import { useDisclosure } from '@mantine/hooks';
+import AddSubject from './AddSubject';
+import { getSubjectList } from '../../store/action/master-action';
 
 // Yup validation schema
 const schema = yup.object().shape({
@@ -60,6 +63,12 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
 
     const dispatch = useDispatch<AppDispatch>(); // Typed dispatch
     const [isSaving, setIsSaving] = useState(false);
+    const [opened, { open, close }] = useDisclosure(false);
+    
+
+    // useEffect(()=>{        
+    //     dispatch(getSubjectList())
+    // },[])
 
     const addOption = () => {
         if (form.values.options.length < 6) {
@@ -103,55 +112,59 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
 
 
     return (
-        <form
-            onSubmit={form.onSubmit(values => handleQuestionSubmit(values))}
-            className="max-w-2xl mx-auto space-y-4"
-        >
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <SegmentedControl
-                    size="xs"
-                    radius="xl"
-                    withItemsBorders={false}
-                    color={
-                        form.getValues().difficulty === "easy"
-                            ? "green"
-                            : form.getValues().difficulty === "medium"
-                                ? "yellow"
-                                : "red"
-                    }
-                    value={form.getValues().difficulty}
-                    onChange={(val) => form.setValues({ difficulty: val })}
-                    data={[
-                        { label: 'Easy', value: 'easy' },
-                        { label: 'Medium', value: 'medium' },
-                        { label: 'Hard', value: 'hard' },
-                    ]}
-                />
+        <>
+            <form
+                onSubmit={form.onSubmit(values => handleQuestionSubmit(values))}
+                className="max-w-2xl mx-auto space-y-4"
+            >
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <SegmentedControl
+                        size="xs"
+                        radius="xl"
+                        withItemsBorders={false}
+                        color={
+                            form.getValues().difficulty === "easy"
+                                ? "green"
+                                : form.getValues().difficulty === "medium"
+                                    ? "yellow"
+                                    : "red"
+                        }
+                        value={form.getValues().difficulty}
+                        onChange={(val) => form.setValues({ difficulty: val })}
+                        data={[
+                            { label: 'Easy', value: 'easy' },
+                            { label: 'Medium', value: 'medium' },
+                            { label: 'Hard', value: 'hard' },
+                        ]}
+                    />
 
-                {/* Integrated Subject & Topic Dropdown */}
-                <SubjectTopicDropdown
-                    onChange={(subject: any, topic: any) =>
-                        form.setValues({ subject, topic })
-                    }
-                    subjectError={form.errors?.subject}
-                    topicError={form.errors?.topic}
-                />
-            </div>
+                    {/* Integrated Subject & Topic Dropdown */}
+                    <SubjectTopicDropdown
+                        onChange={(subject: any, topic: any) =>
+                            form.setValues({ subject, topic })
+                        }
+                        subjectError={form.errors?.subject}
+                        topicError={form.errors?.topic}
+                        openSubjectForm={() => open()}
+                    />
+                </div>
 
-            <div className='flex justify-end items-center '>
-                <TagsInput
-                    data={[]}
-                    placeholder="tags(optional)"
-                    value={form.getValues().tag}
-                    onChange={(val: any) => {
-                        if (val.length > 5) return;
-                        form.setValues({ tag: val });
-                    }}
-                    className="w-fit"
-                />
-            </div>
 
-            {/* <Textarea
+
+                <div className='flex justify-end items-center '>
+                    <TagsInput
+                        data={[]}
+                        placeholder="tags(optional)"
+                        value={form.getValues().tag}
+                        onChange={(val: any) => {
+                            if (val.length > 5) return;
+                            form.setValues({ tag: val });
+                        }}
+                        className="w-fit"
+                    />
+                </div>
+
+                {/* <Textarea
                 placeholder="Write your question here..."
                 label="Question"
                 autosize
@@ -160,73 +173,73 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
                 className="rounded-lg"
                 error={form.errors.question}
             /> */}
-            <p>Question</p>
-            <TextEditor value={form.getValues().question} onChange={({ html, text }) => {
-                (text.trim() === "" ) ? form.setValues({ question: "" }) : form.setValues({ question: html })
-            }} />
-            <p className='text-red-500'>{form.errors?.question}</p>
+                <p>Question</p>
+                <TextEditor value={form.getValues().question} onChange={({ html, text }) => {
+                    (text.trim() === "") ? form.setValues({ question: "" }) : form.setValues({ question: html })
+                }} />
+                <p className='text-red-500'>{form.errors?.question}</p>
 
-            <div className="space-y-2">
-                <label className="block text-sm font-medium">Options</label>
-                {form.values.options?.map((option, index) => (
-                    <div
-                        key={index}
-                        className={`p-2 rounded transition-colors ${form.values.correctAnswer === index
-                            ? 'bg-green-400/15 border-l-4 border-green-400/80'
-                            : 'bg-mine-shaft-950 hover:bg-mine-shaft-900'
-                            }`}
-                    >
-                        <div className="flex gap-2 items-center">
-                            <Radio
-                                value={index.toString()}
-                                checked={form.values.correctAnswer === index}
-                                onChange={() => form.setFieldValue('correctAnswer', index)}
-                                color="green"
-                                variant="outline"
-                                error={false}
-                            />
-                            <TextInput
-                                placeholder={`Option ${index + 1}`}
-                                value={option}
-                                {...form.getInputProps(`options.${index}`)}
-                                className="flex-1 font-semibold"
-                                autoComplete="off"
-                                variant="unstyled"
-                            />
-                            <span
-                                onClick={() => removeOption(index)}
-                                className="px-2 cursor-pointer bg-mine-shaft-800 rounded-full hover:text-red-400"
-                            >
-                                X
-                            </span>
-                        </div>
-                        {form.errors[`options.${index}`] && (
-                            <div className="text-red-500 text-sm mt-1">
-                                {/* {form.errors[`options.${index}`]} */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium">Options</label>
+                    {form.values.options?.map((option, index) => (
+                        <div
+                            key={index}
+                            className={`p-2 rounded transition-colors ${form.values.correctAnswer === index
+                                ? 'bg-green-400/15 border-l-4 border-green-400/80'
+                                : 'bg-mine-shaft-950 hover:bg-mine-shaft-900'
+                                }`}
+                        >
+                            <div className="flex gap-2 items-center">
+                                <Radio
+                                    value={index.toString()}
+                                    checked={form.values.correctAnswer === index}
+                                    onChange={() => form.setFieldValue('correctAnswer', index)}
+                                    color="green"
+                                    variant="outline"
+                                    error={false}
+                                />
+                                <TextInput
+                                    placeholder={`Option ${index + 1}`}
+                                    value={option}
+                                    {...form.getInputProps(`options.${index}`)}
+                                    className="flex-1 font-semibold"
+                                    autoComplete="off"
+                                    variant="unstyled"
+                                />
+                                <span
+                                    onClick={() => removeOption(index)}
+                                    className="px-2 cursor-pointer bg-mine-shaft-800 rounded-full hover:text-red-400"
+                                >
+                                    X
+                                </span>
                             </div>
-                        )}
-                    </div>
-                ))}
+                            {form.errors[`options.${index}`] && (
+                                <div className="text-red-500 text-sm mt-1">
+                                    {/* {form.errors[`options.${index}`]} */}
+                                </div>
+                            )}
+                        </div>
+                    ))}
 
-                {(form.errors.options || form.errors.correctAnswer) && (
-                    <div className="text-red-500 text-sm">
-                        {form.errors.options || form.errors.correctAnswer}
-                    </div>
-                )}
+                    {(form.errors.options || form.errors.correctAnswer) && (
+                        <div className="text-red-500 text-sm">
+                            {form.errors.options || form.errors.correctAnswer}
+                        </div>
+                    )}
 
-                <Button
-                    type="button"
-                    onClick={addOption}
-                    variant="outline"
-                    className="mt-2"
-                    size="sm"
-                    disabled={form.values.options.length >= 4}
-                >
-                    Add Option
-                </Button>
-            </div>
+                    <Button
+                        type="button"
+                        onClick={addOption}
+                        variant="outline"
+                        className="mt-2"
+                        size="sm"
+                        disabled={form.values.options.length >= 4}
+                    >
+                        Add Option
+                    </Button>
+                </div>
 
-            {/* <Textarea
+                {/* <Textarea
                 placeholder="Write the explanation here...(optional)"
                 label="Explanation"
                 autosize
@@ -235,20 +248,23 @@ const AddQuestion = ({ setIsModelOpen }: any) => {
                 className="rounded-lg"
                 error={form.errors.explanation}
             /> */}
-            <p>Explanation</p>
-            <TextEditor value={form.getValues().explanation} onChange={({ html }) => form.setValues({ explanation: html })} />
+                <p>Explanation</p>
+                <TextEditor value={form.getValues().explanation} onChange={({ html }) => form.setValues({ explanation: html })} />
 
-            <Button
-                type="submit"
-                color="green"
-                className="w-full mt-6"
-                size="md"
-                loading={isSaving}
-                disabled={isSaving}
-            >
-                Submit Question
-            </Button>
-        </form>
+                <Button
+                    type="submit"
+                    color="green"
+                    className="w-full mt-6"
+                    size="md"
+                    loading={isSaving}
+                    disabled={isSaving}
+                >
+                    Submit Question
+                </Button>
+            </form>
+            <AddSubject opened={opened} close={close} />
+        </>
+
     );
 };
 

@@ -99,6 +99,10 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
                     <p className="font-bold">Question No: {qId}</p>
                 </Group>
                 <Group justify="end">
+                    <Badge color="blue" className="text-sm">
+                        {question?.subject?.subject}
+                    </Badge>
+
                     {/* Save toggle (optional) */}
                     <ActionIcon
                         variant="transparent"
@@ -157,7 +161,8 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
             {selectedOption.index !== null && selectedOption.isCorrect && (
                 <div className="my-4">
                     <div className="font-bold text-bright-sun-400">Explanation</div>
-                    <div>{question?.explanation}</div>
+                    {/* <div>{question?.explanation}</div> */}
+                    <div dangerouslySetInnerHTML={{ __html: question?.explanation }} />
                 </div>
             )}
         </Card>

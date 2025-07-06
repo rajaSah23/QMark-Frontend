@@ -1,19 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import client from "../../../utils/APIClient";
 import { getUserData } from "../../../utils/Utility";
+import apiClient from "../../../utils/APIClient";
 
 export const getQuestion = createAsyncThunk("getQuestion", async (query: any, { rejectWithValue }) => {
     // console.log(query);
 
-    const userData = getUserData();
-    const jwtToken = `Bearer ${userData?.token}`;
+    // const userData = getUserData();
+    // const jwtToken = `Bearer ${userData?.token}`;
 
 
     try {
-        const response = await client.get("mcq", {
-            params: query,
-            headers: { Authorization: jwtToken }
-        });
+        const response = await apiClient.GET("mcq", query);
         console.log(response.data?.data);
         return response.data?.data;
     } catch (error) {
@@ -24,7 +21,7 @@ export const getQuestion = createAsyncThunk("getQuestion", async (query: any, { 
 })
 export const postQuestion = createAsyncThunk("postQuestion", async (payload: any, { rejectWithValue }) => {
     try {
-        const response = await client.post("mcq", payload);
+        const response = await apiClient.POST("mcq", payload);
         console.log("postQuestion", response.data?.data);
         return response.data?.data;
     } catch (error) {
@@ -34,7 +31,7 @@ export const postQuestion = createAsyncThunk("postQuestion", async (payload: any
 })
 export const deleteQuestion = createAsyncThunk("deleteQuestion", async (id: any, { rejectWithValue }) => {
     try {
-        const response = await client.delete(`mcq/${id}`);
+        const response = await apiClient.DELETE(`mcq/${id}`);
         console.log("deleteQuestion", response.data?.data);
         return response.data?.data;
     } catch (error) {
