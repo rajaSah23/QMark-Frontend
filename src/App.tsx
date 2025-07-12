@@ -72,7 +72,7 @@ function App() {
               <Route path='*' element={<HomePage />} />
               {/* <Route path='*' element={<HomePage />}/> */}
             </Routes>
-            <FooterLinks />
+            {/* <FooterLinks /> */}
           </BrowserRouter>
 
 

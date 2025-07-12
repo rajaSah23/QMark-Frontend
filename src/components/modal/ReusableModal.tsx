@@ -19,7 +19,7 @@ const ReusableModal = ({title}:any) => {
                     blur: 3,
                 }}
                 size={isMobile ? "100%" : "70%"} 
-                className='border border-red-500'
+                // className='border border-red-500'
             >
                 {/* Modal content */}
                 

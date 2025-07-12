@@ -11,7 +11,7 @@ const HomePage = () => {
         {/* <AutoCarousel/> */}
         {/* <BrowseCategoryComponent/> */}
         <HowItWorks/>
-        <Feedbacks/>
+        {/* <Feedbacks/> */}
     </div>
   )
 }
