@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppDispatch } from "../../store";
-import { deleteSubject, deleteTopic, getSubjectList, getTopicList, updateSubject, updateTopic } from "../../store/action/master-action";
-import { IconBorderLeftPlus, IconCheck, IconEdit, IconTrash, IconX } from "@tabler/icons-react";
+import { createTopic, deleteSubject, deleteTopic, getSubjectList, getTopicList, updateSubject, updateTopic } from "../../store/action/master-action";
+import { IconBorderLeftPlus, IconCheck, IconEdit, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
 import AddSubject from "../question/AddSubject";
 
 
@@ -30,6 +30,9 @@ const MasterSettings = () => {
 
   const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
   const [topicEditText, setTopicEditText] = useState('');
+
+  const [newTopicText, setNewTopicText] = useState('');
+  const [addingTopicSubjectId, setAddingTopicSubjectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (location.hash) {
@@ -97,6 +100,25 @@ const MasterSettings = () => {
       <Skeleton key={index} height={45} mb="xs" radius="sm" />
     ))
   );
+
+  const handleAddTopicClick = (subjectId: string) => {
+    setAddingTopicSubjectId(subjectId);
+    setNewTopicText('');
+  };
+
+  const handleSaveNewTopic = (subjectId: string) => {
+    if (newTopicText.trim()) {
+      dispatch(createTopic({ subjectId, topic: newTopicText.trim() }));
+      setAddingTopicSubjectId(null);
+      setNewTopicText('');
+    }
+  };
+
+  const handleCancelNewTopic = () => {
+    setAddingTopicSubjectId(null);
+    setNewTopicText('');
+  };
+
 
   return (
     <div className="p-6">
@@ -188,75 +210,123 @@ const MasterSettings = () => {
                 <Accordion.Panel>
                   {loadingTopic ? (
                     renderTopicSkeletons()
-                  ) : topicList?.length > 0 ? (
-                    topicList.map((topic: any) => (
-                      <Card key={topic._id} withBorder mb={8} p={6}>
-                        <div className="flex justify-between items-center">
-                          {editingTopicId === topic._id ? (
-                            <TextInput
-                              value={topicEditText}
-                              onChange={(e) => setTopicEditText(e.currentTarget.value)}
-                              size="xs"
-                            />
-                          ) : (
-                            <Text size="sm" fw={500}>
-                              {topic.topic}
-                            </Text>
-                          )}
-                          <Group gap={4}>
-                            {editingTopicId === topic._id ? (
-                              <>
-                                <Button
-                                  size="xs"
-                                  variant="light"
-                                  color="green"
-                                  leftSection={<IconCheck size={14} />}
-                                  onClick={() => handleSaveTopic(topic._id)}
-                                  disabled={loadingTopicAction}
-                                >
-                                  Save
-                                </Button>
-                                <Button
-                                  size="xs"
-                                  variant="light"
-                                  color="gray"
-                                  leftSection={<IconX size={14} />}
-                                  onClick={() => setEditingTopicId(null)}
-                                >
-                                  Cancel
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Button
-                                  size="xs"
-                                  variant="light"
-                                  onClick={() => handleEditTopic(topic)}
-                                  disabled={loadingTopicAction}
-                                >
-                                  <IconEdit size={14} />
-                                </Button>
-                                <Button
-                                  size="xs"
-                                  color="red"
-                                  variant="light"
-                                  onClick={() => handleDeleteTopic(topic._id)}
-                                  disabled={loadingTopicAction}
-                                >
-                                  <IconTrash size={14} />
-                                </Button>
-                              </>
-                            )}
-                          </Group>
-                        </div>
-                      </Card>
-                    ))
                   ) : (
-                    <Text size="sm" c="dimmed">
-                      No topics found.
-                    </Text>
+                    <>
+                      {topicList?.length > 0 ? (
+                        topicList.map((topic: any) => (
+                          <Card key={topic._id} withBorder mb={8} p={6}>
+                            <div className="flex justify-between items-center">
+                              {editingTopicId === topic._id ? (
+                                <TextInput
+                                  value={topicEditText}
+                                  onChange={(e) => setTopicEditText(e.currentTarget.value)}
+                                  size="xs"
+                                />
+                              ) : (
+                                <Text size="sm" fw={500}>
+                                  {topic.topic}
+                                </Text>
+                              )}
+                              <Group gap={4}>
+                                {editingTopicId === topic._id ? (
+                                  <>
+                                    <Button
+                                      size="xs"
+                                      variant="light"
+                                      color="green"
+                                      leftSection={<IconCheck size={14} />}
+                                      onClick={() => handleSaveTopic(topic._id)}
+                                      disabled={loadingTopicAction}
+                                    >
+                                      Save
+                                    </Button>
+                                    <Button
+                                      size="xs"
+                                      variant="light"
+                                      color="gray"
+                                      leftSection={<IconX size={14} />}
+                                      onClick={() => setEditingTopicId(null)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Button
+                                      size="xs"
+                                      variant="light"
+                                      onClick={() => handleEditTopic(topic)}
+                                      disabled={loadingTopicAction}
+                                    >
+                                      <IconEdit size={14} />
+                                    </Button>
+                                    <Button
+                                      size="xs"
+                                      color="red"
+                                      variant="light"
+                                      onClick={() => handleDeleteTopic(topic._id)}
+                                      disabled={loadingTopicAction}
+                                    >
+                                      <IconTrash size={14} />
+                                    </Button>
+                                  </>
+                                )}
+                              </Group>
+                            </div>
+                          </Card>
+                        ))
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          No topics found.
+                        </Text>
+                      )}
+
+                      {/* ADD NEW TOPIC SECTION */}
+                      {addingTopicSubjectId === subject._id ? (
+                        <div className="flex gap-2 mt-2">
+                          <TextInput
+                            value={newTopicText}
+                            onChange={(e) => setNewTopicText(e.currentTarget.value)}
+                            size="xs"
+                            className="flex-1"
+                            placeholder="Enter topic name"
+                          />
+                          <Button
+                            size="xs"
+                            variant="light"
+                            color="green"
+                            leftSection={<IconCheck size={14} />}
+                            onClick={() => handleSaveNewTopic(subject._id)}
+                            disabled={loadingTopicAction}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            color="gray"
+                            leftSection={<IconX size={14} />}
+                            onClick={handleCancelNewTopic}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          mt="sm"
+                          size="xs"
+                          variant="light"
+                          leftSection={<IconPlus size={14} />}
+                          onClick={() => handleAddTopicClick(subject._id)}
+                          disabled={loadingTopicAction}
+                        >
+                          Add Topic
+                        </Button>
+                      )}
+                    </>
                   )}
                 </Accordion.Panel>
+
               </Accordion.Item>
             ))}
           </Accordion>

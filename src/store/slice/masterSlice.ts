@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { addSubject, deleteSubject, deleteTopic, getSubjectList, getTopicList, updateSubject, updateTopic } from "../action/master-action"
+import { addSubject, createTopic, deleteSubject, deleteTopic, getSubjectList, getTopicList, updateSubject, updateTopic } from "../action/master-action"
 import { toast } from "../../../utils/APIClient"
 
 
@@ -34,10 +34,33 @@ export const MasterSlice = createSlice({
             state.subjectList.push(subject);
             // state.topicList = [...state.topicList, ...topics]
             state.loadingSubjectAction = false;
+            toast.success("Subject added");
             
-        }).addCase(addSubject.rejected,(state,action)=>{
+        }).addCase(addSubject.rejected,(state,action:any)=>{
             // state = initialState
             state.loadingSubjectAction = false;
+            if(action.payload?.statusCode === 500){
+                toast.error("Failed to add subject");
+                return;
+            }
+            toast.error(action?.payload?.message || "Failed to add subject");
+        })
+        builder.addCase(createTopic.pending,(state,action)=>{
+            state.loadingTopicAction = true
+        }).addCase(createTopic.fulfilled,(state,action)=>{
+            state.topicList.push(action.payload);
+            // state.topicList = [...state.topicList, ...topics]
+            state.loadingTopicAction = false;
+            toast.success("Topic added");
+            
+        }).addCase(createTopic.rejected,(state,action:any)=>{
+            // state = initialState
+            state.loadingTopicAction = false;
+            if(action.payload?.statusCode === 500){
+                toast.error("Failed to add topic");
+                return;
+            }
+            toast.error(action?.payload?.message || "Failed to add topic");
         })
 
         builder.addCase(getSubjectList.pending,(state,action)=>{
@@ -56,9 +79,15 @@ export const MasterSlice = createSlice({
             const filteredSubjects = state.subjectList.filter((subject:any)=> subject._id !== action.payload?._id);
             state.subjectList = filteredSubjects;
             state.loadingSubjectAction = false;
+            toast.success("Subject deleted");
         }).addCase(deleteSubject.rejected,(state,action:any)=>{
             state = initialState
             state.loadingSubjectAction = false;
+            if(action.payload?.statusCode === 500){
+                toast.error("Failed to delete subject");
+                return;
+            }
+            toast.error(action?.payload?.message || "Failed to delete subject")
         })
 
         builder.addCase(deleteTopic.pending,(state,action)=>{
@@ -67,13 +96,19 @@ export const MasterSlice = createSlice({
             const filteredTopics = state.topicList.filter((topic:any)=> topic._id !== action.payload?._id);
             state.topicList = filteredTopics;
             state.loadingTopicAction = false;
-        }).addCase(deleteTopic.rejected,(state,action)=>{
+            toast.success("Topic deleted");
+        }).addCase(deleteTopic.rejected,(state,action:any)=>{
             state = initialState
             state.loadingTopicAction = false;
+            if(action.payload?.statusCode === 500){
+                toast.error("Failed to delete topic");
+                return;
+            }
+            toast.error(action?.payload?.message || "Failed to delete topic");
         })
         
         builder.addCase(updateSubject.pending,(state,action)=>{
-            state.loadingSubjectAction = true
+            state.loadingSubjectAction = true;
         }).addCase(updateSubject.fulfilled,(state,action)=>{
             console.log("updateSubject.fulfilled");
             
@@ -83,6 +118,7 @@ export const MasterSlice = createSlice({
             );
             state.subjectList = updatedSubjects;
             state.loadingSubjectAction = false;
+            toast.success("Subject updated");
         }).addCase(updateSubject.rejected,(state,action:any)=>{
             console.log("updateSubject.rejected");
             state.loadingSubjectAction = false;
@@ -104,8 +140,14 @@ export const MasterSlice = createSlice({
             );
             state.topicList = updatedTopics;
             state.loadingTopicAction = false;
-        }).addCase(updateTopic.rejected,(state,action)=>{
+            toast.success("Topic updated");
+        }).addCase(updateTopic.rejected,(state,action:any)=>{
             state.loadingTopicAction = false;
+            if(action.payload?.statusCode === 500){
+                toast.error("Failed to update topic");
+                return;
+            }
+            toast.error(action?.payload?.message || "Failed to update topic");
         })
 
         builder.addCase(getTopicList.pending,(state,action)=>{

@@ -14,6 +14,16 @@ export const addSubject = createAsyncThunk("addSubject", async (payload: any, { 
     }
 })
 
+export const createTopic = createAsyncThunk("createTopic", async (payload: any, { rejectWithValue }) => {
+    try {
+        const response = await apiClient.POST("/master/topic", payload);        
+        return response.data?.data;
+    } catch (error:any) {
+        console.log(error);
+        throw rejectWithValue(error?.response?.data ||"Failed to create topic");
+    }
+})
+
 export const getSubjectList = createAsyncThunk("getSubjectList", async (params, { rejectWithValue }) => {    
     try {
         const response = await apiClient.GET("/master/subjects");
