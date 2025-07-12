@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { deleteQuestion, getQuestion, postQuestion } from "../action/question-action"
+import { addToBookmarks, deleteQuestion, getQuestion, postQuestion } from "../action/question-action"
+import { toast } from "../../../utils/APIClient"
 
 
 
@@ -9,7 +10,8 @@ export interface InitialState {
     totalPages:any,
     total:any,
     error:any,
-    loading:boolean
+    loading:boolean,
+    loadingAction:boolean
   }
  
 
@@ -19,7 +21,8 @@ const initialState:InitialState = {
     totalPages:0,
     total:0,
     error:null,
-    loading:false
+    loading:false,
+    loadingAction:false,
 }
 export const QuestionSlice = createSlice({
     name:"questions",
@@ -43,8 +46,32 @@ export const QuestionSlice = createSlice({
         builder.addCase(postQuestion.pending,(state,action)=>{
         }).addCase(postQuestion.fulfilled,(state,action)=>{
             state.data?.unshift(action.payload);
+            state.total = state.total + 1;
+            state.totalPages = Math.ceil(state.total / 10); // Assuming 10 items per
         }).addCase(postQuestion.rejected,(state,action)=>{
             // state = initialState
+        })
+
+        builder.addCase(addToBookmarks.pending,(state,action)=>{
+            state.loadingAction = true;
+
+        }).addCase(addToBookmarks.fulfilled,(state,action)=>{
+            const updatedData = state.data?.map((mcq:any)=>{
+                if(mcq._id === action.payload?._id){
+                    return action.payload;
+                }
+                return mcq;
+            })
+            state.data = updatedData;
+            state.loadingAction = false;
+            toast.success(action.payload?.bookmark ? "Added to bookmarks":"Removed from bookmarks")
+        }).addCase(addToBookmarks.rejected,(state,action:any)=>{
+            state.loadingAction = false;
+            if(action?.payload?.statusCode === 500){
+                toast.error("Failed to add to bookmarks");
+                return;
+            }
+            toast.error(action.payload?.message)
         })
 
 

@@ -12,9 +12,9 @@ import {
     IconTrash,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { deleteQuestion } from '../../store/action/question-action';
+import { addToBookmarks, deleteQuestion } from '../../store/action/question-action';
 
 // Option component
 const Option = ({
@@ -39,6 +39,8 @@ const Option = ({
 
 // Main McqCard component
 export default function McqCard({ qId, question, onToggleSave }: any) {
+    const { loadingAction} = useSelector((state: any) => state.questions);
+
     interface AnswerState {
         index: number | null;
         isCorrect: boolean | null;
@@ -91,12 +93,18 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
             .finally(() => setIsDeleting(false));
     };
 
+    // Bookmark toggle handler
+    const onBookmarkToggle = () =>{
+        console.log(question);
+        dispatch(addToBookmarks({questionId: question?._id, bookmark: !question?.bookmark}))
+    }
+
     return (
         <Card className="bg-mine-shaft-800 text-white shadow-lg border border-mine-shaft-800">
             {/* Header */}
             <Group justify="space-between">
                 <Group justify="end">
-                    <p className="font-bold">Question No: {qId}</p>
+                    <p className="font-bold text-mine-shaft-500">Question No: {qId}</p>
                 </Group>
                 <Group justify="end">
                     <Badge color="blue" className="text-sm">
@@ -106,10 +114,11 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
                     {/* Save toggle (optional) */}
                     <ActionIcon
                         variant="transparent"
-                        onClick={onToggleSave}
+                        onClick={onBookmarkToggle}
                         className="text-bright-sun-400 hover:text-bright-sun-300"
+                        disabled={loadingAction}
                     >
-                        {false ? <IconBookmarkFilled /> : <IconBookmark />}
+                        {question?.bookmark ? <IconBookmarkFilled /> : <IconBookmark />}
                     </ActionIcon>
 
                     {/* Difficulty Badge */}
@@ -133,6 +142,7 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
                             variant="transparent"
                             onClick={handleDeleteMCQ}
                             className="text-bright-sun-400 hover:text-bright-sun-300"
+                            disabled={loadingAction}
                         >
                             <IconTrash />
                         </ActionIcon>

@@ -31,6 +31,7 @@ const data = [
 ];
 
 export function FooterLinks() {
+  if(window.location.pathname.includes("questions")) return null;
   const groups = data.map((group) => {
     const links = group.links.map((link, index) => (
       <a

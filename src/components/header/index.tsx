@@ -59,7 +59,7 @@ const Header = () => {
         </div>
 
         {/* Desktop NavLinks */}
-        <div className="hidden md:block">
+        <div className="hidden md:block" >
           <NavLinks />
         </div>
 

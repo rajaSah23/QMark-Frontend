@@ -16,11 +16,23 @@ const QuestionList = () => {
     // console.log(searchParams.get("subject"));
     const difficulty = searchParams.get("difficulty") || "easy";
     // console.log(Object.fromEntries(searchParams.entries()));
+
+    const url = window.location.pathname
+    const isBookmarkPage = url.includes("bookmarks");
+    
+
+    if(isBookmarkPage){
+        searchParams.set("bookmark","true");
+    }else{
+        searchParams.delete("bookmark")
+    }
+        
     
 
     useEffect(() => {
+        
         dispatch(getQuestion(Object.fromEntries(searchParams.entries())));
-    }, [searchParams])
+    }, [searchParams,url])
     console.log("Store:", data);
 
     const handleDifficultyChange = (val: any) => {
@@ -43,7 +55,7 @@ const QuestionList = () => {
         <div className="space-y-6 p-0">
             
             <div className=' flex justify-between items-center'>
-                <ReusableModal title={getTitle()}/>
+                {isBookmarkPage?null:<ReusableModal title={getTitle()}/>}
                 {/* Total question and pages */}
                 <div className='text-bright-sun-400 text-sm'>
                     Total : {total} | Pages: {page} out of {totalPages}

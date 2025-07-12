@@ -49,6 +49,7 @@ function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ViewProfile />} />
                 <Route path="/questions" element={<Questions />} />
+                <Route path="/questions/bookmarks" element={<Questions />} />
               </Route>
 
               {/* Public Routes */}

@@ -29,6 +29,17 @@ export const postQuestion = createAsyncThunk("postQuestion", async (payload: any
         rejectWithValue("Data not found");
     }
 })
+
+export const addToBookmarks = createAsyncThunk("addToBookmarks", async (payload:any, { rejectWithValue }) => {
+    try {
+        const response = await apiClient.PATCH("mcq", payload);
+        console.log("addToBookmarks", response.data?.data);
+        return response.data?.data;
+    } catch (error:any) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data || "Failed to add to bookmarks");
+    }
+})
 export const deleteQuestion = createAsyncThunk("deleteQuestion", async (id: any, { rejectWithValue }) => {
     try {
         const response = await apiClient.DELETE(`mcq/${id}`);
