@@ -1,25 +1,43 @@
-import { Badge, Button, Card, Group, ScrollArea, Text, Title } from "@mantine/core";
+import { Accordion, Badge, Button, Card, Group, ScrollArea, Skeleton, Text, TextInput, Title } from "@mantine/core";
 import { getUserData } from "../../../utils/Utility";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppDispatch } from "../../store";
-import { deleteSubject, getSubjectList } from "../../store/action/master-action";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { deleteSubject, deleteTopic, getSubjectList, getTopicList, updateSubject, updateTopic } from "../../store/action/master-action";
+import { IconBorderLeftPlus, IconCheck, IconEdit, IconTrash, IconX } from "@tabler/icons-react";
+import AddSubject from "../question/AddSubject";
+
 
 const MasterSettings = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { subjectList } = useSelector((state: any) => state.master);
+  const {
+    subjectList,
+    topicList,
+    loadingSubject,
+    loadingSubjectAction,
+    loadingTopic,
+    loadingTopicAction,
+  } = useSelector((state: any) => state.master);
+
   const location = useLocation();
+
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [isModelOpen, setIsModelOpen] = useState(false);
+
+  const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);
+  const [subjectEditText, setSubjectEditText] = useState('');
+
+  const [editingTopicId, setEditingTopicId] = useState<string | null>(null);
+  const [topicEditText, setTopicEditText] = useState('');
 
   useEffect(() => {
     if (location.hash) {
-      const id = location.hash.replace("#", "");
+      const id = location.hash.replace('#', '');
       const el = document.getElementById(id);
       if (el) {
-        // Scroll after the DOM is painted
         setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth" });
+          el.scrollIntoView({ behavior: 'smooth' });
         }, 0);
       }
     }
@@ -31,66 +49,229 @@ const MasterSettings = () => {
     }
   }, [dispatch, subjectList]);
 
-  const handleDelete = (subjectId: string) => {
+  const handleSubjectClick = (subjectId: string | null) => {
+    setExpanded((prev) => (prev === subjectId ? null : subjectId));
+    if (subjectId) dispatch(getTopicList(subjectId));
+  };
 
+  const handleDeleteSubject = (subjectId: string) => {
     dispatch(deleteSubject(subjectId));
-
   };
 
-  const handleEdit = (subject: any) => {
-    // You can pass subject data to open a modal for editing
-    console.log('Edit subject:', subject);
-    // Example: openSubjectEditModal(subject);
+  const handleDeleteTopic = (topicId: string) => {
+    dispatch(deleteTopic(topicId));
   };
+
+  const handleEditSubject = (subject: any) => {
+    setEditingSubjectId(subject._id);
+    setSubjectEditText(subject.subject);
+  };
+
+  const handleSaveSubject = (subjectId: string) => {
+    if (subjectEditText.trim()) {
+      dispatch(updateSubject({ subjectId, subject: subjectEditText.trim() }));
+      setEditingSubjectId(null);
+    }
+  };
+
+  const handleEditTopic = (topic: any) => {
+    setEditingTopicId(topic._id);
+    setTopicEditText(topic.topic);
+  };
+
+  const handleSaveTopic = (topicId: string) => {
+    if (topicEditText.trim()) {
+      dispatch(updateTopic({ topicId, topic: topicEditText.trim() }));
+      setEditingTopicId(null);
+    }
+  };
+
+  const renderSubjectSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <Skeleton key={index} height={70} mb="sm" radius="md" />
+    ))
+  );
+
+  const renderTopicSkeletons = () => (
+    Array.from({ length: 2 }).map((_, index) => (
+      <Skeleton key={index} height={45} mb="xs" radius="sm" />
+    ))
+  );
 
   return (
-    <div className="p-6" >
-      <Title order={3} mb={20}>
+    <div className="p-6">
+      <Title className="flex justify-between items-center" order={3} mb={20}>
         Master Settings – Subject List
+        <Button size="xs" variant="light" onClick={() => setIsModelOpen(true)}>
+          <IconBorderLeftPlus /> Add Subject
+        </Button>
       </Title>
 
-      <ScrollArea h={400}>
-        {subjectList?.length > 0 ? (
-          subjectList.map((subject: any) => (
-            <Card key={subject._id} shadow="xs" padding="md" mb={12} withBorder>
-              <div className="flex justify-between items-center">
-                <div>
-                  <Text fw={600}>{subject.subject}</Text>
-                  <Text size="sm" c="dimmed">
-                    Created At: {subject.createdAt ? new Date(subject.createdAt).toLocaleDateString() : "N/A"}
-                  </Text>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Group gap={4}>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      leftSection={<IconEdit size={14} />}
-                      onClick={() => handleEdit(subject)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="xs"
-                      color="red"
-                      variant="light"
-                      leftSection={<IconTrash size={14} />}
-                      onClick={() => handleDelete(subject._id)}
-                    >
-                      Delete
-                    </Button>
-                  </Group>
-                </div>
-              </div>
-            </Card>
-          ))
+      <ScrollArea h={500}>
+        {loadingSubject ? (
+          <div>{renderSubjectSkeletons()}</div>
+        ) : subjectList?.length > 0 ? (
+          <Accordion
+            variant="separated"
+            multiple={false}
+            value={expanded}
+            onChange={(value) => {
+              handleSubjectClick(value);
+            }}
+          >
+            {subjectList.map((subject: any) => (
+              <Accordion.Item key={subject._id} value={subject._id}>
+                <Accordion.Control>
+                  <div className="flex justify-between w-full items-center">
+                    <div>
+                      {editingSubjectId === subject._id ? (
+                        <TextInput
+                          value={subjectEditText}
+                          onChange={(e) => setSubjectEditText(e.currentTarget.value)}
+                          size="xs"
+                          className="mb-1"
+                        />
+                      ) : (
+                        <Text fw={600}>{subject.subject}</Text>
+                      )}
+                      <Text size="xs" c="dimmed">
+                        Created At: {new Date(subject.createdAt).toLocaleDateString()}
+                      </Text>
+                    </div>
+                    <Group gap={4}>
+                      {editingSubjectId === subject._id ? (
+                        <>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            color="green"
+                            leftSection={<IconCheck size={14} />}
+                            onClick={() => handleSaveSubject(subject._id)}
+                            disabled={loadingSubjectAction}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            color="gray"
+                            leftSection={<IconX size={14} />}
+                            onClick={() => setEditingSubjectId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            onClick={() => handleEditSubject(subject)}
+                            disabled={loadingSubjectAction}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="xs"
+                            color="red"
+                            variant="light"
+                            onClick={() => handleDeleteSubject(subject._id)}
+                            disabled={loadingSubjectAction}
+                          >
+                            Delete
+                          </Button>
+                        </>
+                      )}
+                    </Group>
+                  </div>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  {loadingTopic ? (
+                    renderTopicSkeletons()
+                  ) : topicList?.length > 0 ? (
+                    topicList.map((topic: any) => (
+                      <Card key={topic._id} withBorder mb={8} p={6}>
+                        <div className="flex justify-between items-center">
+                          {editingTopicId === topic._id ? (
+                            <TextInput
+                              value={topicEditText}
+                              onChange={(e) => setTopicEditText(e.currentTarget.value)}
+                              size="xs"
+                            />
+                          ) : (
+                            <Text size="sm" fw={500}>
+                              {topic.topic}
+                            </Text>
+                          )}
+                          <Group gap={4}>
+                            {editingTopicId === topic._id ? (
+                              <>
+                                <Button
+                                  size="xs"
+                                  variant="light"
+                                  color="green"
+                                  leftSection={<IconCheck size={14} />}
+                                  onClick={() => handleSaveTopic(topic._id)}
+                                  disabled={loadingTopicAction}
+                                >
+                                  Save
+                                </Button>
+                                <Button
+                                  size="xs"
+                                  variant="light"
+                                  color="gray"
+                                  leftSection={<IconX size={14} />}
+                                  onClick={() => setEditingTopicId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="xs"
+                                  variant="light"
+                                  onClick={() => handleEditTopic(topic)}
+                                  disabled={loadingTopicAction}
+                                >
+                                  <IconEdit size={14} />
+                                </Button>
+                                <Button
+                                  size="xs"
+                                  color="red"
+                                  variant="light"
+                                  onClick={() => handleDeleteTopic(topic._id)}
+                                  disabled={loadingTopicAction}
+                                >
+                                  <IconTrash size={14} />
+                                </Button>
+                              </>
+                            )}
+                          </Group>
+                        </div>
+                      </Card>
+                    ))
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      No topics found.
+                    </Text>
+                  )}
+                </Accordion.Panel>
+              </Accordion.Item>
+            ))}
+          </Accordion>
         ) : (
           <Text>No subjects found.</Text>
         )}
       </ScrollArea>
+
+      <AddSubject opened={isModelOpen} close={() => setIsModelOpen(false)} />
     </div>
   );
 };
+
+
+
 const ViewProfile = () => {
   // const userdata = getUserData();
   const navigate = useNavigate()
