@@ -15,7 +15,7 @@ export const getQuestion = createAsyncThunk("getQuestion", async (query: any, { 
         return response.data?.data;
     } catch (error) {
         console.log(error);
-        rejectWithValue("Data not found");
+        return rejectWithValue("Data not found");
 
     }
 })

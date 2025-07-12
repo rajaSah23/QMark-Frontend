@@ -16,7 +16,7 @@ export interface InitialState {
  
 
 const initialState:InitialState = {
-    data:null,
+    data:[],
     page:1,
     totalPages:0,
     total:0,
@@ -27,20 +27,32 @@ const initialState:InitialState = {
 export const QuestionSlice = createSlice({
     name:"questions",
     initialState,
-    reducers:{},
+    reducers:{
+        clearState:(state)=>{
+            state.data = [];
+            state.page = 1;
+            state.totalPages = 0;
+            state.total = 0;
+            state.error = null;
+            state.loading = false;
+            state.loadingAction = false;
+        }
+    },
     extraReducers:(builder)=>{
         builder.addCase(getQuestion.pending,(state,action)=>{
             state.loading=true;
-            state.data = null;
+            // state.data = null;
         }).addCase(getQuestion.fulfilled,(state,action)=>{
-            state.data = action.payload.results;
+            state.data = [...state.data,...action.payload.results];
             state.page = action.payload.page;
             state.total = action.payload.total
             state.totalPages = action.payload.totalPages
             state.error = null;
             state.loading =false;
-        }).addCase(getQuestion.rejected,(state,action)=>{
-            state = initialState
+        }).addCase(getQuestion.rejected,(state,action)=>{            
+            // state = initialState
+            state.loading =false;
+
         })
 
         builder.addCase(postQuestion.pending,(state,action)=>{
@@ -85,6 +97,7 @@ export const QuestionSlice = createSlice({
     }
 
 })
+export const { clearState } = QuestionSlice.actions;
 
 export default QuestionSlice.reducer;
 

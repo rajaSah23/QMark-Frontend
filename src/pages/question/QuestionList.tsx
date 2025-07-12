@@ -8,32 +8,44 @@ import ReusableModal from '../../components/modal/ReusableModal';
 import { getQuestion } from '../../store/action/question-action';
 import { useSearchParams } from 'react-router-dom';
 // import { toast } from '../../../utils/APIClient';
+import { useInView } from 'react-intersection-observer';
+import { clearState } from '../../store/slice/QuestionSlice';
 
 const QuestionList = () => {
     const dispatch = useDispatch<AppDispatch>();  // ✅ Typed dispatch
-    const { data, loading, total,page,totalPages } = useSelector((state: any) => state.questions);
+    const { data, loading, total, page, totalPages } = useSelector((state: any) => state.questions);
     const [searchParams, setSearchParams] = useSearchParams()
+    const { ref, inView } = useInView();
+    console.log("loading",loading);
+    
+
     // console.log(searchParams.get("subject"));
     const difficulty = searchParams.get("difficulty") || "easy";
     // console.log(Object.fromEntries(searchParams.entries()));
 
     const url = window.location.pathname
     const isBookmarkPage = url.includes("bookmarks");
-    
 
-    if(isBookmarkPage){
-        searchParams.set("bookmark","true");
-    }else{
+
+    if (isBookmarkPage) {
+        searchParams.set("bookmark", "true");
+    } else {
         searchParams.delete("bookmark")
     }
-        
-    
+
+
 
     useEffect(() => {
-        
-        dispatch(getQuestion(Object.fromEntries(searchParams.entries())));
-    }, [searchParams,url])
+        dispatch(clearState());
+        dispatch(getQuestion({...Object.fromEntries(searchParams.entries()),page:1}));
+    }, [searchParams, url])
     console.log("Store:", data);
+
+    useEffect(() => {
+        if (inView && !loading && page < totalPages) {
+            dispatch(getQuestion({...Object.fromEntries(searchParams.entries()),page:page+1}));
+        }
+      }, [inView]);
 
     const handleDifficultyChange = (val: any) => {
         const newSearchParams = new URLSearchParams(searchParams);
@@ -47,15 +59,15 @@ const QuestionList = () => {
         </div>
     }
 
-    if (loading) return (
-        <div className=' w-full h-[100vh] flex justify-center items-center'> <Loader /></div>
-    )
+    // if (loading) return (
+    //     <div className=' w-full h-[100vh] flex justify-center items-center'> <Loader /></div>
+    // )
 
     return (
         <div className="space-y-6 p-0">
-            
+
             <div className=' flex justify-between items-center'>
-                {isBookmarkPage?null:<ReusableModal title={getTitle()}/>}
+                {isBookmarkPage ? null : <ReusableModal title={getTitle()} />}
                 {/* Total question and pages */}
                 <div className='text-bright-sun-400 text-sm'>
                     Total : {total} | Pages: {page} out of {totalPages}
@@ -87,6 +99,17 @@ const QuestionList = () => {
                         />
                     </Grid.Col>
                 ))}
+
+                {/* If no data found */}
+                {data?.length === 0 && !loading && (
+                    <Grid.Col span={12} className='flex justify-center items-center'>
+                        <div className='text-mine-shaft-400 text-lg'>No Questions Found</div>
+                    </Grid.Col>
+                )}
+                {/* Loader & Observer div */}
+                <Grid.Col span={12}  ref={ref} className='flex justify-center items-center'>
+                    {loading  && <Loader />}
+                </Grid.Col>
             </Grid>
         </div>
     );
