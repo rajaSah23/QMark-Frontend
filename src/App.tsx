@@ -20,6 +20,8 @@ import '@mantine/tiptap/styles.css';
 import LoginPage from './pages/auth/LoginPage.tsx';
 import RegisterPage from './pages/auth/RegisterPage.tsx';
 import OtpVerifyPage from './pages/auth/OtpVerifyPage.tsx';
+import ForgotPassword from './pages/auth/forgotPassword/ForgotPassword.tsx';
+import ResetPassword from './pages/auth/forgotPassword/ResetPassword.tsx';
 // require('dotenv').config();
 
 
@@ -56,6 +58,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/verify-otp" element={<OtpVerifyPage />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
 
 
               <Route path='/profile' element={<ViewProfile />} />

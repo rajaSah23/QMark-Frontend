@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { loginUser, registerUser, verifyOTP } from "../action/user-action"
+import { forgotPassword, loginUser, registerUser, resetPassword, verifyOTP } from "../action/user-action"
 import { toast } from "../../../utils/APIClient"
 
 
@@ -70,6 +70,20 @@ export const UserSlice = createSlice({
         }).addCase(loginUser.rejected, (state, action: any) => {
             toast.error(action.payload?.message || "Failed to login")
             state.loading = false
+        })
+        
+        builder.addCase(forgotPassword.pending, (state, action) => {
+        }).addCase(forgotPassword.fulfilled, (state, action) => {
+            toast.success( action.payload?.message)
+        }).addCase(forgotPassword.rejected, (state, action: any) => {
+            toast.error(action.payload?.message)
+        })
+        
+        builder.addCase(resetPassword.pending, (state, action) => {
+        }).addCase(resetPassword.fulfilled, (state, action) => {
+            toast.success( action.payload?.message)
+        }).addCase(resetPassword.rejected, (state, action: any) => {
+            toast.error(action.payload?.message)
         })
     }
 

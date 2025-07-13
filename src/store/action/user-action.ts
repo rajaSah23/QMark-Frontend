@@ -29,6 +29,34 @@ export const resendOTP = createAsyncThunk(
     }
 );
 
+export const forgotPassword = createAsyncThunk(
+    "forgotPassword",
+    async (payload: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.POST("/user/forgot-password", payload);
+            console.log(response.data?.data);
+            
+            return response.data;
+        } catch (error: any) {            
+            const payload = error.response?.data || { message: "Unknown error" };
+            return rejectWithValue(payload);
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    "resetPassword",
+    async (payload: any, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.POST("/user/reset-password", payload);
+            return response.data;
+        } catch (error: any) {
+            const payload = error.response?.data || { message: "Unknown error" };
+            return rejectWithValue(payload);
+        }
+    }
+);
+
 export const verifyOTP = createAsyncThunk(
     "verifyOTP",
     async (payload: any, { rejectWithValue }) => {
