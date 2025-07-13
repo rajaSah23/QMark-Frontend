@@ -47,7 +47,7 @@ export const deleteQuestion = createAsyncThunk("deleteQuestion", async (id: any,
         return response.data?.data;
     } catch (error) {
         console.log(error);
-        rejectWithValue("Data not found");
+        return rejectWithValue("Data not found");
 
     }
 })

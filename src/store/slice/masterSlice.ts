@@ -69,7 +69,7 @@ export const MasterSlice = createSlice({
             state.subjectList = action.payload;
             state.loadingSubject = false;
         }).addCase(getSubjectList.rejected,(state,action)=>{
-            state = initialState
+            // state = initialState
             state.loadingSubject = false;
         })
 
@@ -81,7 +81,7 @@ export const MasterSlice = createSlice({
             state.loadingSubjectAction = false;
             toast.success("Subject deleted");
         }).addCase(deleteSubject.rejected,(state,action:any)=>{
-            state = initialState
+            // state = initialState
             state.loadingSubjectAction = false;
             if(action.payload?.statusCode === 500){
                 toast.error("Failed to delete subject");
@@ -98,7 +98,7 @@ export const MasterSlice = createSlice({
             state.loadingTopicAction = false;
             toast.success("Topic deleted");
         }).addCase(deleteTopic.rejected,(state,action:any)=>{
-            state = initialState
+            // state = initialState
             state.loadingTopicAction = false;
             if(action.payload?.statusCode === 500){
                 toast.error("Failed to delete topic");
@@ -156,7 +156,7 @@ export const MasterSlice = createSlice({
             state.topicList = action.payload;
             state.loadingTopic = false;
         }).addCase(getTopicList.rejected,(state,action)=>{
-            state = initialState
+            // state = initialState            
             state.loadingTopic = false;
         })
 
