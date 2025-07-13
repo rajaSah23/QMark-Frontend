@@ -10,14 +10,15 @@ import { useSearchParams } from 'react-router-dom';
 // import { toast } from '../../../utils/APIClient';
 import { useInView } from 'react-intersection-observer';
 import { clearState } from '../../store/slice/QuestionSlice';
+import SearchBox from '../../components/searchBox/SearchBox';
 
 const QuestionList = () => {
     const dispatch = useDispatch<AppDispatch>();  // ✅ Typed dispatch
     const { data, loading, total, page, totalPages } = useSelector((state: any) => state.questions);
     const [searchParams, setSearchParams] = useSearchParams()
     const { ref, inView } = useInView();
-    console.log("loading",loading);
-    
+    console.log("loading", loading);
+
 
     // console.log(searchParams.get("subject"));
     const difficulty = searchParams.get("difficulty") || "easy";
@@ -37,15 +38,15 @@ const QuestionList = () => {
 
     useEffect(() => {
         dispatch(clearState());
-        dispatch(getQuestion({...Object.fromEntries(searchParams.entries()),page:1}));
+        dispatch(getQuestion({ ...Object.fromEntries(searchParams.entries()), page: 1 }));
     }, [searchParams, url])
     console.log("Store:", data);
 
     useEffect(() => {
         if (inView && !loading && page < totalPages) {
-            dispatch(getQuestion({...Object.fromEntries(searchParams.entries()),page:page+1}));
+            dispatch(getQuestion({ ...Object.fromEntries(searchParams.entries()), page: page + 1 }));
         }
-      }, [inView]);
+    }, [inView]);
 
     const handleDifficultyChange = (val: any) => {
         const newSearchParams = new URLSearchParams(searchParams);
@@ -66,26 +67,33 @@ const QuestionList = () => {
     return (
         <div className="space-y-6 p-0">
 
-            <div className=' flex justify-between items-center'>
-                {isBookmarkPage ? null : <ReusableModal title={getTitle()} />}
-                {/* Total question and pages */}
-                <div className='text-bright-sun-400 text-sm'>
-                    Total : {total} | Pages: {page} out of {totalPages}
-                </div>
+            <div className=' flex justify-between items-center flex-wrap gap-2'>
+                <div className=' flex justify-between items-center gap-3'>
+                    {isBookmarkPage ? null : <ReusableModal title={getTitle()} />}
+                    <SearchBox />
 
-                <SegmentedControl
-                    size="xs"
-                    radius="xl"
-                    withItemsBorders={false}
-                    color={difficulty === "easy" ? "green" : difficulty === "medium" ? "yellow" : "red"}
-                    value={difficulty}
-                    onChange={((val) => handleDifficultyChange(val))}
-                    data={[
-                        { label: 'Easy', value: 'easy' },
-                        { label: 'Medium', value: 'medium' },
-                        { label: 'Hard', value: 'hard' },
-                    ]}
-                />
+                </div>
+                <div className=' flex justify-between items-center'>
+
+                    {/* Total question and pages */}
+                    <div className='text-bright-sun-400 text-sm'>
+                        Total : {total} | Pages: {page} out of {totalPages}
+                    </div>
+                    <SegmentedControl
+
+                        size="xs"
+                        radius="xl"
+                        withItemsBorders={false}
+                        color={difficulty === "easy" ? "green" : difficulty === "medium" ? "yellow" : "red"}
+                        value={difficulty}
+                        onChange={((val) => handleDifficultyChange(val))}
+                        data={[
+                            { label: 'Easy', value: 'easy' },
+                            { label: 'Medium', value: 'medium' },
+                            { label: 'Hard', value: 'hard' },
+                        ]}
+                    />
+                </div>
             </div>
             {/* <h2 className="text-2xl font-bold text-bright-sun-400">Saved Questions</h2> */}
             <Grid >
@@ -107,8 +115,8 @@ const QuestionList = () => {
                     </Grid.Col>
                 )}
                 {/* Loader & Observer div */}
-                <Grid.Col span={12}  ref={ref} className='flex justify-center items-center'>
-                    {loading  && <Loader />}
+                <Grid.Col span={12} ref={ref} className='flex justify-center items-center'>
+                    {loading && <Loader />}
                 </Grid.Col>
             </Grid>
         </div>
