@@ -11,7 +11,7 @@ import { AppDispatch } from '../../store';
 
 const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {userData, loading } = useSelector((store: any) => store.user)
+  const { userData, loading } = useSelector((store: any) => store.user)
 
 
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Header = () => {
   const [userdata, setUserdata] = useState<any>(null);
 
 
-  console.log("getUserData",userData);
+  console.log("getUserData", userData);
 
   // Sync localStorage to store
   useEffect(() => {
@@ -45,14 +45,15 @@ const Header = () => {
       window.removeEventListener("storage", updateFromLocalStorage);
     };
   }, [dispatch]);
-  
+
 
   return (
-    <header className="w-full bg-mine-shaft-950 text-white">
+    <header className="fixed top-0 left-0 w-full z-50 bg-mine-shaft-950/50 backdrop-blur-sm backdrop-saturate-200 text-white ">
+
       {/* Top Header */}
       <div className="flex justify-between items-center p-4">
         {/* Logo */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={()=> navigate("/")}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
           <div className="text-2xl md:text-4xl font-bold text-bright-sun-400">
             <span className="text-white"> </span> Q<span className="text-white">Mark</span>
           </div>
@@ -65,7 +66,7 @@ const Header = () => {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {!userData? <button  onClick={()=>navigate("/login")} className="border px-4 py-1 rounded-full bg-mine-shaft-800 hover:cursor-pointer hover:bg-bright-sun-500">
+          {!userData ? <button onClick={() => navigate("/login")} className="border px-4 py-1 rounded-full bg-mine-shaft-800 hover:cursor-pointer hover:bg-bright-sun-500">
             Login
           </button>
             :

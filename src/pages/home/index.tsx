@@ -6,7 +6,7 @@ import Feedbacks from './Feedbacks'
 
 const HomePage = () => {
   return (
-    <div className='bg-mine-shaft-950 min-h-screen font-["poppins"]'>
+    <div className='bg-mine-shaft-950 min-h-screen font-["poppins"] pt-20'>
         <Content/>
         {/* <AutoCarousel/> */}
         {/* <BrowseCategoryComponent/> */}

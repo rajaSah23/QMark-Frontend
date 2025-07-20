@@ -7,7 +7,7 @@ const Layout = ({ children }:any) => {
   return (
     <div className="flex h-screen">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block">
+      <div className="hidden md:block pt-17">
         <Sidebar />
       </div>
 
@@ -44,7 +44,7 @@ const Layout = ({ children }:any) => {
           </button>
           <h1 className="text-xl font-semibold">Subjects</h1>
         </header>
-        <main className="p-4 overflow-auto">
+        <main className="overflow-auto pt-20 p-4">
           {children}
         </main>
       </div>
