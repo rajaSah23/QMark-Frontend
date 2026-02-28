@@ -9,6 +9,21 @@ import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import AddSubject from '../question/AddSubject';
 
+type CreateQuizFormValues = {
+  title: string;
+  description: string;
+  shuffleQuestions: boolean;
+  shuffleOptions: boolean;
+  timeLimit: number;
+
+  subject: string;
+  topic: string;
+  difficulty: string;
+  limit: number;
+
+  questionIds: string[];
+};
+
 const CreateQuiz = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -17,7 +32,7 @@ const CreateQuiz = () => {
     const { data: mcqData } = useSelector((state: RootState) => state.questions as any);
     const [opened, { open, close }] = useDisclosure(false);
 
-    const form = useForm({
+    const form = useForm<CreateQuizFormValues>({
         initialValues: {
             title: '',
             description: '',
