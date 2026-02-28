@@ -35,9 +35,9 @@ export const forgotPassword = createAsyncThunk(
         try {
             const response = await apiClient.POST("/user/forgot-password", payload);
             console.log(response.data?.data);
-            
+
             return response.data;
-        } catch (error: any) {            
+        } catch (error: any) {
             const payload = error.response?.data || { message: "Unknown error" };
             return rejectWithValue(payload);
         }

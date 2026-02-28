@@ -66,68 +66,7 @@ const SubjectTopicDropdown: React.FC<SubjectTopicDropdownProps> = ({ onChange, s
   }, [topicList])
 
 
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      // Simulated API response
-      const data: any[] = [
-        {
-          name: 'Computer Network',
-          slug: 'computer-network',
-          topics: [
-            { name: 'OSI Model', slug: 'osi-model' },
-            { name: 'TCP/IP', slug: 'tcp-ip' },
-            { name: 'Other', slug: 'other' },
-          ],
-        },
-        {
-          name: 'DBMS',
-          slug: 'dbms',
-          topics: [
-            { name: 'SQL', slug: 'sql' },
-            { name: 'NoSQL', slug: 'nosql' },
-            { name: 'Other', slug: 'other' },
-          ],
-        },
-        {
-          name: 'Operating System',
-          slug: 'operating-system',
-          topics: [
-            { name: 'Process Management', slug: 'process-management' },
-            { name: 'Memory Management', slug: 'memory-management' },
-            { name: 'Other', slug: 'other' },
-          ],
-        },
-        {
-          name: 'Data Structures',
-          slug: 'data-structures',
-          topics: [
-            { name: 'Arrays', slug: 'arrays' },
-            { name: 'Linked Lists', slug: 'linked-lists' },
-            { name: 'Other', slug: 'other' },
-          ],
-        },
-        {
-          name: 'Other',
-          slug: 'other',
-          topics: [
-            { name: 'Other', slug: 'other' },
-          ],
-        },
-        {
-          name: '+ Add Subject',
-          slug: 'add-subject',
-          topics: [],
-        },
-      ];
 
-      // Simulate API delay
-      setTimeout(() => {
-        setSubjectData(data);
-      }, 500);
-    };
-
-    // fetchSubjects();
-  }, []);
 
   // Map subject data to options for the Subject Select
   const subjectOptions = subjectData.map((subject: any) => ({

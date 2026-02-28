@@ -26,16 +26,16 @@ export const postQuestion = createAsyncThunk("postQuestion", async (payload: any
         return response.data?.data;
     } catch (error) {
         console.log(error);
-        rejectWithValue("Data not found");
+        return rejectWithValue("Data not found");
     }
 })
 
-export const addToBookmarks = createAsyncThunk("addToBookmarks", async (payload:any, { rejectWithValue }) => {
+export const addToBookmarks = createAsyncThunk("addToBookmarks", async (payload: any, { rejectWithValue }) => {
     try {
         const response = await apiClient.PATCH("mcq", payload);
         console.log("addToBookmarks", response.data?.data);
         return response.data?.data;
-    } catch (error:any) {
+    } catch (error: any) {
         console.log(error);
         return rejectWithValue(error?.response?.data || "Failed to add to bookmarks");
     }
@@ -52,7 +52,18 @@ export const deleteQuestion = createAsyncThunk("deleteQuestion", async (id: any,
     }
 })
 
-export default { getQuestion, postQuestion }
+export const updateQuestion = createAsyncThunk("updateQuestion", async (payload: any, { rejectWithValue }) => {
+    try {
+        const response = await apiClient.PATCH("mcq", payload);
+        console.log("updateQuestion", response.data?.data);
+        return response.data?.data;
+    } catch (error: any) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data || "Failed to update question");
+    }
+})
+
+export default { getQuestion, postQuestion, updateQuestion }
 
 
 

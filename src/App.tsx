@@ -22,6 +22,15 @@ import RegisterPage from './pages/auth/RegisterPage.tsx';
 import OtpVerifyPage from './pages/auth/OtpVerifyPage.tsx';
 import ForgotPassword from './pages/auth/forgotPassword/ForgotPassword.tsx';
 import ResetPassword from './pages/auth/forgotPassword/ResetPassword.tsx';
+import QuizLayout from './pages/quiz';
+import QuizList from './pages/quiz/QuizList';
+import CreateQuiz from './pages/quiz/CreateQuiz';
+import QuizDetail from './pages/quiz/QuizDetail';
+import QuizAttempt from './pages/quiz/QuizAttempt';
+import AttemptResult from './pages/quiz/AttemptResult';
+import AttemptHistory from './pages/quiz/AttemptHistory';
+import ActivityDashboard from './pages/profile/ActivityDashboard';
+import QuizPerformanceDashboard from './pages/profile/QuizPerformanceDashboard';
 // require('dotenv').config();
 
 
@@ -50,8 +59,20 @@ function App() {
               {/* ✅ Protected Routes Wrapper */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ViewProfile />} />
+                <Route path="/dashboard/activity" element={<ActivityDashboard />} />
+                <Route path="/dashboard/quiz-performance" element={<QuizPerformanceDashboard />} />
                 <Route path="/questions" element={<Questions />} />
                 <Route path="/questions/bookmarks" element={<Questions />} />
+                
+                {/* Quiz Feature Routes */}
+                <Route path="/quiz" element={<QuizLayout />}>
+                    <Route index element={<QuizList />} />
+                    <Route path="create" element={<CreateQuiz />} />
+                    <Route path=":quizId" element={<QuizDetail />} />
+                    <Route path=":quizId/attempt" element={<QuizAttempt />} />
+                    <Route path=":quizId/result/:attemptId" element={<AttemptResult />} />
+                    <Route path=":quizId/history" element={<AttemptHistory />} />
+                </Route>
               </Route>
 
               {/* Public Routes */}

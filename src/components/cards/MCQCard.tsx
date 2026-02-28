@@ -10,11 +10,15 @@ import {
     IconBookmark,
     IconBookmarkFilled,
     IconTrash,
+    IconEdit
 } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../store';
 import { addToBookmarks, deleteQuestion } from '../../store/action/question-action';
+import EditQuestion from '../../pages/question/EditQuestion';
+import { Modal } from '@mantine/core';
 
 // Option component
 const Option = ({
@@ -52,6 +56,7 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
         isCorrect: null,
     });
     const [isDeleting, setIsDeleting] = useState(false);
+    const [editModalOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -134,6 +139,15 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
                         {question?.difficulty}
                     </Badge>
 
+                    {/* Edit Button */}
+                    <ActionIcon
+                        variant="transparent"
+                        onClick={openEdit}
+                        className="text-bright-sun-400 hover:text-bright-sun-300"
+                    >
+                        <IconEdit />
+                    </ActionIcon>
+
                     {/* Delete Button or Loader */}
                     {isDeleting ? (
                         <Loader size={22} />
@@ -175,6 +189,23 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
                     <div dangerouslySetInnerHTML={{ __html: question?.explanation }} />
                 </div>
             )}
+
+            {/* Edit Question Modal */}
+            <Modal
+                opened={editModalOpened}
+                onClose={closeEdit}
+                title={
+                    <div className="text-bright-sun-400 text-xl font-bold">
+                        Edit Question
+                    </div>
+                }
+                size="xl"
+            >
+                <EditQuestion 
+                    setIsModelOpen={closeEdit}
+                    questionData={question}
+                />
+            </Modal>
         </Card>
     );
 }

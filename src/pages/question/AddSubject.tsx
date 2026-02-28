@@ -8,10 +8,8 @@ import { addSubject } from '../../store/action/master-action';
 
 const schema = yup.object().shape({
   subject: yup.string().required('Subject name is required'),
-  topics: yup
-    .array()
-    .of(yup.string().required('Topic name is required'))
-    .min(1, 'At least one topic is required'),
+  // topics are no longer required for the new standalone endpoint
+  topics: yup.array().of(yup.string()),
 });
 
 const AddSubject = ({ opened, close }: any) => {
@@ -32,7 +30,8 @@ const AddSubject = ({ opened, close }: any) => {
   }, [opened]);
 
   const handleSubmit = (values: typeof form.values) => {
-    dispatch(addSubject(values));
+    // Only send the subject name to the new endpoint
+    dispatch(addSubject({ subject: values.subject }));
     close();
   };
 
@@ -56,17 +55,7 @@ const AddSubject = ({ opened, close }: any) => {
           className="mb-4"
         />
 
-        <TagsInput
-          data={[]} // Optional: can provide suggested tags
-          placeholder="Add topics (max 10)"
-          value={form.values.topics}
-          onChange={(val) => {
-            if (val.length <= 10) {
-              form.setFieldValue('topics', val);
-            }
-          }}
-          error={form.errors.topics}
-        />
+        {/* Topics input removed since we are just adding a generic subject now. Topics can be added later or we use the specific endpoint if we wanted both. */}
 
         <Button
           type="submit"

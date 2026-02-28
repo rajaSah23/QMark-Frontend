@@ -36,6 +36,13 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 h-full bg-mine-shaft-950 text-white p-4 overflow-y-auto">
+      <div className="mb-6 border-b border-mine-shaft-800 pb-4">
+        <Link to="/quiz" className="flex items-center gap-2 p-2 rounded-md hover:bg-mine-shaft-800 text-bright-sun-400 font-semibold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          My Quizzes
+        </Link>
+      </div>
+
       <h2 className="text-xl font-semibold mb-4 flex gap-1 items-center">Subjects <span className='cursor-pointer' onClick={()=>navigate("/profile#master-settings")}><IconEdit/></span></h2>
       <ul>
         {subjectList?.map((subject: any) => {
