@@ -83,6 +83,17 @@ const QuizDetail = () => {
                     Start Quiz Now
                 </Button>
             </Card>
+            {/* Question list only */}
+            <Card className="bg-mine-shaft-900 p-6" radius="md">
+                <h2 className="text-xl font-bold text-bright-sun-400 mb-4">Questions</h2>
+                <div className="space-y-4">
+                    {currentQuiz.questions?.map((q: any,idx: number) => (
+                        <div key={q._id} className="bg-mine-shaft-800 border-none p-4 ">
+                            <Text size="lg" fw={700} mb="sm" ><div className='flex' dangerouslySetInnerHTML={{ __html: `${idx + 1}.  ${q.question}` }} /></Text>
+                        </div>
+                    ))}
+                </div>
+            </Card>               
         </div>
     );
 };

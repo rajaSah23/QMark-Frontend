@@ -12,21 +12,23 @@ import {
     Text,
     Group,
     Badge,
-    Loader,
+    Skeleton,
     Grid,
     Table,
     Tabs,
 } from '@mantine/core';
 import {
-    IconCalendar,
     IconTarget,
     IconTrendingUp,
     IconBook,
+    IconChartBar,
 } from '@tabler/icons-react';
 import { DatePickerInput } from '@mantine/dates';
 import {
     BarChart,
     Bar,
+    LineChart,
+    Line,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -43,13 +45,28 @@ import {
     Radar,
 } from 'recharts';
 
+const COLORS = ['#ffbd20', '#40c057', '#748ffc', '#ff6b6b', '#4c6ef5'];
+
+const MetricCard = ({ label, value, icon: Icon, color, sub }: any) => (
+    <Card className="bg-mine-shaft-800 border border-mine-shaft-700 hover:border-bright-sun-400 transition-colors h-full">
+        <Group justify="space-between" mb="sm">
+            <div>
+                <Text size="xs" c="dimmed" className="uppercase font-bold tracking-wide">{label}</Text>
+                <Text size="xl" fw={700} style={{ color }}>{value}</Text>
+                {sub && <Text size="xs" c="dimmed" mt={2}>{sub}</Text>}
+            </div>
+            <Icon size={32} style={{ color }} />
+        </Group>
+    </Card>
+);
+
 const QuizPerformanceDashboard = () => {
     const dispatch = useDispatch<AppDispatch>();
     const {
         quizPerformanceStats,
         subjectWisePerformance,
         difficultyWisePerformance,
-        loading,
+        loadingStats,
     } = useSelector((state: RootState) => state.performance as any);
 
     const [dateRange, setLocalDateRange] = useState<[Date | null, Date | null]>([
@@ -60,148 +77,118 @@ const QuizPerformanceDashboard = () => {
     const [activeTab, setActiveTab] = useState<string | null>('overview');
 
     useEffect(() => {
-        if (dateRange[0] && dateRange[1]) {
-            const startDate = dateRange[0].toISOString().split('T')[0];
-            const endDate = dateRange[1].toISOString().split('T')[0];
-            dispatch(setDateRange({ startDate, endDate }));
-            dispatch(getQuizPerformanceStats({ startDate, endDate }));
-            dispatch(getSubjectWisePerformance({ startDate, endDate }));
-            dispatch(getDifficultyWisePerformance({ startDate, endDate }));
-        }
+        // Guard: skip dispatch if either date is null (user cleared the picker)
+        if (!dateRange[0] || !dateRange[1]) return;
+        const startDate = dateRange[0].toISOString().split('T')[0];
+        const endDate = dateRange[1].toISOString().split('T')[0];
+        dispatch(setDateRange({ startDate, endDate }));
+        dispatch(getQuizPerformanceStats({ startDate, endDate }));
+        dispatch(getSubjectWisePerformance({ startDate, endDate }));
+        dispatch(getDifficultyWisePerformance({ startDate, endDate }));
     }, [dispatch, dateRange]);
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <Loader />
-            </div>
-        );
-    }
+    const stats = quizPerformanceStats || [];
+    const totalQuizzes = stats.length;
 
-    // Calculate metrics
-    const totalQuizzes = quizPerformanceStats.length;
-    const avgScore =
-        totalQuizzes > 0
-            ? Math.round(
-                  quizPerformanceStats.reduce(
-                      (sum: number, q: any) => sum + (q.percentage || 0),
-                      0
-                  ) / totalQuizzes
-              )
-            : 0;
-    const maxScore = Math.max(
-        ...(quizPerformanceStats.map((q: any) => q.percentage || 0) || [0])
-    );
-    const minScore = Math.min(
-        ...(quizPerformanceStats.map((q: any) => q.percentage || 0) || [100])
-    );
-    const passedQuizzes = quizPerformanceStats.filter(
-        (q: any) => q.percentage >= 60
-    ).length;
+    // Guard against empty arrays for Math.min / Math.max
+    const avgScore = totalQuizzes > 0
+        ? Math.round(stats.reduce((s: number, q: any) => s + (q.percentage || 0), 0) / totalQuizzes)
+        : 0;
+    const maxScore = totalQuizzes > 0 ? Math.max(...stats.map((q: any) => q.percentage || 0)) : 0;
+    const minScore = totalQuizzes > 0 ? Math.min(...stats.map((q: any) => q.percentage || 0)) : 0;
+    const passedQuizzes = stats.filter((q: any) => q.percentage >= 60).length;
 
-    const COLORS = ['#ffbd20', '#40c057', '#748ffc', '#ff6b6b', '#4c6ef5'];
+    // Score trend data: chronological order for line chart
+    const scoreTrend = [...stats]
+        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map((q: any, i: number) => ({
+            attempt: `#${i + 1}`,
+            Score: q.percentage,
+            Quiz: q.quizTitle,
+        }));
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 pt-6 pb-12">
+        <div className="max-w-7xl mx-auto space-y-6 pt-20 pb-12 px-4">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-bright-sun-400 mb-2">
-                    Quiz Performance Dashboard
-                </h1>
-                <p className="text-mine-shaft-400">
-                    Analyze your quiz performance and track progress
-                </p>
+                <h1 className="text-3xl font-bold text-bright-sun-400 mb-1">Quiz Performance</h1>
+                <p className="text-mine-shaft-400 text-sm">Analyze your quiz results and track score trends</p>
             </div>
 
             {/* Date Range Picker */}
-            <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-4">
-                <Group grow>
+            <Card className="bg-mine-shaft-900 border border-mine-shaft-700 p-4">
+                <Group>
                     <DatePickerInput
                         type="range"
-                        label="Select Date Range"
-                        placeholder="Pick dates range"
+                        label="Date Range"
+                        placeholder="Pick a date range"
                         value={dateRange}
-                        onChange={(value) =>
-                            setLocalDateRange(value as [Date | null, Date | null])
-                        }
+                        onChange={(value) => setLocalDateRange(value as [Date | null, Date | null])}
                         clearable
+                        style={{ minWidth: 260 }}
                     />
+                    {!dateRange[0] && (
+                        <Text size="sm" c="dimmed" mt="md">Select a date range to view performance data.</Text>
+                    )}
                 </Group>
             </Card>
 
             {/* Key Metrics */}
             <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                    <Card className="bg-mine-shaft-800 border border-mine-shaft-700 hover:border-bright-sun-400 transition-colors">
-                        <Group justify="space-between" mb="md">
-                            <div>
-                                <Text size="sm" c="dimmed" className="uppercase font-bold">
-                                    Total Quizzes
-                                </Text>
-                                <Text size="xl" fw={700} className="text-bright-sun-400">
-                                    {totalQuizzes}
-                                </Text>
-                            </div>
-                            <IconTarget size={32} className="text-bright-sun-400" />
-                        </Group>
-                    </Card>
+                    {loadingStats ? <Skeleton height={100} radius="md" /> : (
+                        <MetricCard label="Total Quizzes" value={totalQuizzes} icon={IconTarget} color="#ffbd20" />
+                    )}
                 </Grid.Col>
-
                 <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                    <Card className="bg-mine-shaft-800 border border-mine-shaft-700 hover:border-green-400 transition-colors">
-                        <Group justify="space-between" mb="md">
-                            <div>
-                                <Text size="sm" c="dimmed" className="uppercase font-bold">
-                                    Average Score
-                                </Text>
-                                <Text size="xl" fw={700} className="text-green-400">
-                                    {avgScore}%
-                                </Text>
-                            </div>
-                            <IconTrendingUp size={32} className="text-green-400" />
-                        </Group>
-                    </Card>
+                    {loadingStats ? <Skeleton height={100} radius="md" /> : (
+                        <MetricCard label="Average Score" value={`${avgScore}%`} icon={IconTrendingUp} color="#40c057" />
+                    )}
                 </Grid.Col>
-
                 <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                    <Card className="bg-mine-shaft-800 border border-mine-shaft-700 hover:border-blue-400 transition-colors">
-                        <Group justify="space-between" mb="md">
-                            <div>
-                                <Text size="sm" c="dimmed" className="uppercase font-bold">
-                                    Passed Quizzes
-                                </Text>
-                                <Text size="xl" fw={700} className="text-blue-400">
-                                    {passedQuizzes}/{totalQuizzes}
-                                </Text>
-                            </div>
-                            <Badge color="blue" variant="light">
-                                {totalQuizzes > 0
-                                    ? Math.round((passedQuizzes / totalQuizzes) * 100)
-                                    : 0}
-                                %
-                            </Badge>
-                        </Group>
-                    </Card>
+                    {loadingStats ? <Skeleton height={100} radius="md" /> : (
+                        <MetricCard
+                            label="Pass Rate"
+                            value={totalQuizzes > 0 ? `${Math.round((passedQuizzes / totalQuizzes) * 100)}%` : '—'}
+                            icon={IconChartBar}
+                            color="#4dabf7"
+                            sub={`${passedQuizzes} / ${totalQuizzes} passed`}
+                        />
+                    )}
                 </Grid.Col>
-
                 <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-                    <Card className="bg-mine-shaft-800 border border-mine-shaft-700 hover:border-purple-400 transition-colors">
-                        <Group justify="space-between" mb="md">
-                            <div>
-                                <Text size="sm" c="dimmed" className="uppercase font-bold">
-                                    Score Range
-                                </Text>
-                                <Text size="sm" fw={700} className="text-purple-400">
-                                    {minScore}% - {maxScore}%
-                                </Text>
-                            </div>
-                            <IconBook size={32} className="text-purple-400" />
-                        </Group>
-                    </Card>
+                    {loadingStats ? <Skeleton height={100} radius="md" /> : (
+                        <MetricCard
+                            label="Score Range"
+                            value={totalQuizzes > 0 ? `${minScore}–${maxScore}%` : '—'}
+                            icon={IconBook}
+                            color="#da77f2"
+                        />
+                    )}
                 </Grid.Col>
             </Grid>
 
-            {/* Charts and Analysis */}
+            {/* Score Trend */}
+            {!loadingStats && scoreTrend.length > 1 && (
+                <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-6">
+                    <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">Score Trend</Text>
+                    <ResponsiveContainer width="100%" height={220}>
+                        <LineChart data={scoreTrend}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                            <XAxis dataKey="attempt" stroke="#999" style={{ fontSize: '12px' }} />
+                            <YAxis stroke="#999" domain={[0, 100]} style={{ fontSize: '12px' }} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #555', borderRadius: '8px' }}
+                                labelStyle={{ color: '#fff' }}
+                                formatter={(val: any, name: any, props: any) => [`${val}%`, props.payload.Quiz || name]}
+                            />
+                            <Line type="monotone" dataKey="Score" stroke="#ffbd20" strokeWidth={2} dot={{ fill: '#ffbd20', r: 4 }} activeDot={{ r: 6 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </Card>
+            )}
+
+            {/* Charts and Analysis Tabs */}
             <Tabs value={activeTab} onChange={setActiveTab} color="green">
                 <Tabs.List>
                     <Tabs.Tab value="overview">Score Distribution</Tabs.Tab>
@@ -214,97 +201,47 @@ const QuizPerformanceDashboard = () => {
                     <Grid>
                         <Grid.Col span={{ base: 12, md: 6 }}>
                             <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-6">
-                                <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">
-                                    Quiz Score Distribution
-                                </Text>
-                                {quizPerformanceStats.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height={300}>
-                                        <BarChart data={quizPerformanceStats.slice(0, 10)}>
+                                <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">Quiz Score Distribution</Text>
+                                {loadingStats ? <Skeleton height={280} radius="md" /> : stats.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={280}>
+                                        <BarChart data={stats.slice(0, 10)}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                                            <XAxis
-                                                dataKey="quizTitle"
-                                                stroke="#999"
-                                                angle={-45}
-                                                textAnchor="end"
-                                                height={80}
-                                                interval={0}
-                                                tick={{ fontSize: 10 }}
-                                            />
-                                            <YAxis stroke="#999" />
-                                            <Tooltip
-                                                contentStyle={{
-                                                    backgroundColor: '#2d2d2d',
-                                                    border: '1px solid #555',
-                                                }}
-                                                labelStyle={{ color: '#fff' }}
-                                            />
-                                            <Bar dataKey="percentage" fill="#ffbd20" />
+                                            <XAxis dataKey="quizTitle" stroke="#999" angle={-35} textAnchor="end" height={70} interval={0} tick={{ fontSize: 10 }} />
+                                            <YAxis stroke="#999" domain={[0, 100]} />
+                                            <Tooltip contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #555' }} labelStyle={{ color: '#fff' }} />
+                                            <Bar dataKey="percentage" fill="#ffbd20" radius={[4, 4, 0, 0]} name="Score %" />
                                         </BarChart>
                                     </ResponsiveContainer>
-                                ) : (
-                                    <Text c="dimmed" ta="center" py="xl">
-                                        No quiz data available
-                                    </Text>
-                                )}
+                                ) : <Text c="dimmed" ta="center" py="xl">No quiz data for this range</Text>}
                             </Card>
                         </Grid.Col>
 
                         <Grid.Col span={{ base: 12, md: 6 }}>
                             <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-6">
-                                <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">
-                                    Pass/Fail Ratio
-                                </Text>
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={[
-                                                {
-                                                    name: 'Passed',
-                                                    value: passedQuizzes,
-                                                    color: '#40c057',
-                                                },
-                                                {
-                                                    name: 'Failed',
-                                                    value: totalQuizzes - passedQuizzes,
-                                                    color: '#ff6b6b',
-                                                },
-                                            ]}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={({ name, value }: any) =>
-                                                `${name}: ${value}`
-                                            }
-                                            outerRadius={80}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                        >
-                                            {[
-                                                {
-                                                    name: 'Passed',
-                                                    value: passedQuizzes,
-                                                    color: '#40c057',
-                                                },
-                                                {
-                                                    name: 'Failed',
-                                                    value: totalQuizzes - passedQuizzes,
-                                                    color: '#ff6b6b',
-                                                },
-                                            ].map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={entry.color}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#2d2d2d',
-                                                border: '1px solid #555',
-                                            }}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">Pass / Fail Ratio</Text>
+                                {loadingStats ? <Skeleton height={280} radius="md" /> : (
+                                    <ResponsiveContainer width="100%" height={280}>
+                                        <PieChart>
+                                            <Pie
+                                                data={[
+                                                    { name: 'Passed', value: passedQuizzes, color: '#40c057' },
+                                                    { name: 'Failed', value: Math.max(0, totalQuizzes - passedQuizzes), color: '#ff6b6b' },
+                                                ]}
+                                                cx="50%"
+                                                cy="50%"
+                                                labelLine={false}
+                                                label={({ name, value }: any) => value > 0 ? `${name}: ${value}` : ''}
+                                                outerRadius={90}
+                                                dataKey="value"
+                                            >
+                                                {['#40c057', '#ff6b6b'].map((color, i) => (
+                                                    <Cell key={i} fill={color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #555' }} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                )}
                             </Card>
                         </Grid.Col>
                     </Grid>
@@ -312,248 +249,130 @@ const QuizPerformanceDashboard = () => {
 
                 <Tabs.Panel value="subject" pt="xl">
                     <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-6">
-                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">
-                            Subject-Wise Performance
-                        </Text>
-                        {subjectWisePerformance.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={400}>
-                                <RadarChart data={subjectWisePerformance}>
-                                    <PolarGrid stroke="#444" />
-                                    <PolarAngleAxis
-                                        dataKey="subject"
-                                        stroke="#999"
-                                    />
-                                    <PolarRadiusAxis stroke="#999" />
-                                    <Radar
-                                        name="Average Score"
-                                        dataKey="averageScore"
-                                        stroke="#ffbd20"
-                                        fill="#ffbd20"
-                                        fillOpacity={0.6}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: '#2d2d2d',
-                                            border: '1px solid #555',
-                                        }}
-                                    />
-                                    <Legend />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <Text c="dimmed" ta="center" py="xl">
-                                No subject data available
-                            </Text>
-                        )}
-
-                        {subjectWisePerformance.length > 0 && (
-                            <Table striped mt="lg">
-                                <Table.Thead className="bg-mine-shaft-950">
-                                    <Table.Tr>
-                                        <Table.Th>Subject</Table.Th>
-                                        <Table.Th>Quizzes Taken</Table.Th>
-                                        <Table.Th>Average Score</Table.Th>
-                                        <Table.Th>Best Score</Table.Th>
-                                    </Table.Tr>
-                                </Table.Thead>
-                                <Table.Tbody>
-                                    {subjectWisePerformance.map(
-                                        (subject: any, idx: number) => (
-                                            <Table.Tr
-                                                key={idx}
-                                                className="hover:bg-mine-shaft-800"
-                                            >
-                                                <Table.Td fw={500}>
-                                                    {subject.subject}
-                                                </Table.Td>
-                                                <Table.Td>{subject.quizzesTaken}</Table.Td>
+                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">Subject-Wise Performance</Text>
+                        {loadingStats ? <Skeleton height={350} radius="md" /> : (subjectWisePerformance || []).length > 0 ? (
+                            <>
+                                <ResponsiveContainer width="100%" height={320}>
+                                    <RadarChart data={subjectWisePerformance}>
+                                        <PolarGrid stroke="#444" />
+                                        <PolarAngleAxis dataKey="subject" stroke="#999" tick={{ fontSize: 12 }} />
+                                        <PolarRadiusAxis stroke="#999" />
+                                        <Radar name="Avg Score" dataKey="averageScore" stroke="#ffbd20" fill="#ffbd20" fillOpacity={0.55} />
+                                        <Tooltip contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #555' }} />
+                                        <Legend />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                                <Table striped mt="lg">
+                                    <Table.Thead className="bg-mine-shaft-950">
+                                        <Table.Tr>
+                                            <Table.Th>Subject</Table.Th>
+                                            <Table.Th>Quizzes</Table.Th>
+                                            <Table.Th>Avg Score</Table.Th>
+                                            <Table.Th>Best Score</Table.Th>
+                                        </Table.Tr>
+                                    </Table.Thead>
+                                    <Table.Tbody>
+                                        {(subjectWisePerformance || []).map((s: any, i: number) => (
+                                            <Table.Tr key={i} className="hover:bg-mine-shaft-800">
+                                                <Table.Td fw={500}>{s.subject}</Table.Td>
+                                                <Table.Td>{s.quizzesTaken}</Table.Td>
                                                 <Table.Td>
-                                                    <Badge
-                                                        color={
-                                                            subject.averageScore >= 70
-                                                                ? 'green'
-                                                                : subject.averageScore >=
-                                                                      50
-                                                                    ? 'yellow'
-                                                                    : 'red'
-                                                        }
-                                                    >
-                                                        {subject.averageScore}%
+                                                    <Badge color={s.averageScore >= 70 ? 'green' : s.averageScore >= 50 ? 'yellow' : 'red'}>
+                                                        {s.averageScore}%
                                                     </Badge>
                                                 </Table.Td>
-                                                <Table.Td>
-                                                    <Text fw={600}>
-                                                        {subject.bestScore}%
-                                                    </Text>
-                                                </Table.Td>
+                                                <Table.Td><Text fw={600}>{s.bestScore}%</Text></Table.Td>
                                             </Table.Tr>
-                                        )
-                                    )}
-                                </Table.Tbody>
-                            </Table>
-                        )}
+                                        ))}
+                                    </Table.Tbody>
+                                </Table>
+                            </>
+                        ) : <Text c="dimmed" ta="center" py="xl">No subject data available</Text>}
                     </Card>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="difficulty" pt="xl">
                     <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg p-6">
-                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">
-                            Difficulty-Wise Performance
-                        </Text>
-                        {difficultyWisePerformance.length > 0 ? (
+                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400">Difficulty-Wise Performance</Text>
+                        {loadingStats ? <Skeleton height={300} radius="md" /> : (difficultyWisePerformance || []).length > 0 ? (
                             <>
-                                <ResponsiveContainer width="100%" height={300}>
+                                <ResponsiveContainer width="100%" height={260}>
                                     <BarChart data={difficultyWisePerformance}>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                                         <XAxis dataKey="difficulty" stroke="#999" />
                                         <YAxis stroke="#999" />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#2d2d2d',
-                                                border: '1px solid #555',
-                                            }}
-                                        />
+                                        <Tooltip contentStyle={{ backgroundColor: '#2d2d2d', border: '1px solid #555' }} />
                                         <Legend />
-                                        <Bar
-                                            dataKey="averageScore"
-                                            fill="#40c057"
-                                            name="Average Score"
-                                        />
-                                        <Bar
-                                            dataKey="accuracy"
-                                            fill="#748ffc"
-                                            name="Accuracy"
-                                        />
+                                        <Bar dataKey="averageScore" fill="#40c057" name="Avg Score" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="accuracy" fill="#748ffc" name="Accuracy %" radius={[4, 4, 0, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
-
                                 <Table striped mt="lg">
                                     <Table.Thead className="bg-mine-shaft-950">
                                         <Table.Tr>
                                             <Table.Th>Difficulty</Table.Th>
-                                            <Table.Th>Questions Solved</Table.Th>
-                                            <Table.Th>Correct Answers</Table.Th>
+                                            <Table.Th>Questions</Table.Th>
+                                            <Table.Th>Correct</Table.Th>
                                             <Table.Th>Accuracy</Table.Th>
                                         </Table.Tr>
                                     </Table.Thead>
                                     <Table.Tbody>
-                                        {difficultyWisePerformance.map(
-                                            (difficulty: any, idx: number) => (
-                                                <Table.Tr
-                                                    key={idx}
-                                                    className="hover:bg-mine-shaft-800"
-                                                >
-                                                    <Table.Td fw={500}>
-                                                        <Badge
-                                                            color={
-                                                                difficulty.difficulty ===
-                                                                'Easy'
-                                                                    ? 'green'
-                                                                    : difficulty.difficulty ===
-                                                                          'Medium'
-                                                                        ? 'yellow'
-                                                                        : 'red'
-                                                            }
-                                                        >
-                                                            {difficulty.difficulty}
-                                                        </Badge>
-                                                    </Table.Td>
-                                                    <Table.Td>
-                                                        {difficulty.questionsSolved}
-                                                    </Table.Td>
-                                                    <Table.Td>
-                                                        {difficulty.correctAnswers}
-                                                    </Table.Td>
-                                                    <Table.Td>
-                                                        <Text fw={600}>
-                                                            {difficulty.accuracy}%
-                                                        </Text>
-                                                    </Table.Td>
-                                                </Table.Tr>
-                                            )
-                                        )}
+                                        {(difficultyWisePerformance || []).map((d: any, i: number) => (
+                                            <Table.Tr key={i} className="hover:bg-mine-shaft-800">
+                                                <Table.Td fw={500}>
+                                                    <Badge color={d.difficulty === 'Easy' ? 'green' : d.difficulty === 'Medium' ? 'yellow' : 'red'}>
+                                                        {d.difficulty}
+                                                    </Badge>
+                                                </Table.Td>
+                                                <Table.Td>{d.questionsSolved}</Table.Td>
+                                                <Table.Td>{d.correctAnswers}</Table.Td>
+                                                <Table.Td><Text fw={600}>{d.accuracy}%</Text></Table.Td>
+                                            </Table.Tr>
+                                        ))}
                                     </Table.Tbody>
                                 </Table>
                             </>
-                        ) : (
-                            <Text c="dimmed" ta="center" py="xl">
-                                No difficulty data available
-                            </Text>
-                        )}
+                        ) : <Text c="dimmed" ta="center" py="xl">No difficulty data available</Text>}
                     </Card>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="details" pt="xl">
                     <Card className="bg-mine-shaft-900 border border-mine-shaft-700 shadow-lg overflow-hidden">
-                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400 p-6">
-                            Quiz Details
-                        </Text>
-                        {quizPerformanceStats.length > 0 ? (
+                        <Text size="lg" fw={700} mb="md" className="text-bright-sun-400 p-6 pb-0">Quiz Details</Text>
+                        {loadingStats ? <Skeleton height={200} radius="md" mx="lg" mb="lg" /> : stats.length > 0 ? (
                             <Table striped>
                                 <Table.Thead className="bg-mine-shaft-950">
                                     <Table.Tr>
                                         <Table.Th>Quiz Title</Table.Th>
                                         <Table.Th>Score</Table.Th>
                                         <Table.Th>Percentage</Table.Th>
-                                        <Table.Th>Time Taken</Table.Th>
+                                        <Table.Th>Time</Table.Th>
+                                        <Table.Th>Date</Table.Th>
                                         <Table.Th>Status</Table.Th>
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
-                                    {quizPerformanceStats.map(
-                                        (quiz: any, idx: number) => (
-                                            <Table.Tr
-                                                key={idx}
-                                                className="hover:bg-mine-shaft-800"
-                                            >
-                                                <Table.Td fw={500}>
-                                                    {quiz.quizTitle}
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    {quiz.score}/{quiz.totalQuestions}
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    <Badge
-                                                        color={
-                                                            quiz.percentage >= 70
-                                                                ? 'green'
-                                                                : quiz.percentage >=
-                                                                      50
-                                                                    ? 'yellow'
-                                                                    : 'red'
-                                                        }
-                                                    >
-                                                        {quiz.percentage}%
-                                                    </Badge>
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    {Math.round(
-                                                        quiz.timeTaken / 60
-                                                    )}m
-                                                </Table.Td>
-                                                <Table.Td>
-                                                    <Badge
-                                                        color={
-                                                            quiz.percentage >= 60
-                                                                ? 'green'
-                                                                : 'red'
-                                                        }
-                                                    >
-                                                        {quiz.percentage >= 60
-                                                            ? 'Passed'
-                                                            : 'Failed'}
-                                                    </Badge>
-                                                </Table.Td>
-                                            </Table.Tr>
-                                        )
-                                    )}
+                                    {stats.map((q: any, i: number) => (
+                                        <Table.Tr key={i} className="hover:bg-mine-shaft-800">
+                                            <Table.Td fw={500}>{q.quizTitle}</Table.Td>
+                                            <Table.Td>{q.score}/{q.totalQuestions}</Table.Td>
+                                            <Table.Td>
+                                                <Badge color={q.percentage >= 70 ? 'green' : q.percentage >= 50 ? 'yellow' : 'red'}>
+                                                    {q.percentage}%
+                                                </Badge>
+                                            </Table.Td>
+                                            <Table.Td>{q.timeTaken ? `${Math.round(q.timeTaken / 60)}m` : '—'}</Table.Td>
+                                            <Table.Td>{q.date}</Table.Td>
+                                            <Table.Td>
+                                                <Badge color={q.percentage >= 60 ? 'green' : 'red'}>
+                                                    {q.percentage >= 60 ? 'Passed' : 'Failed'}
+                                                </Badge>
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    ))}
                                 </Table.Tbody>
                             </Table>
-                        ) : (
-                            <Text c="dimmed" ta="center" py="xl">
-                                No quiz data available
-                            </Text>
-                        )}
+                        ) : <Text c="dimmed" ta="center" py="xl">No quiz data for this range</Text>}
                     </Card>
                 </Tabs.Panel>
             </Tabs>

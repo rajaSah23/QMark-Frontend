@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { forgotPassword, loginUser, registerUser, resetPassword, verifyOTP } from "../action/user-action"
+import { forgotPassword, loginUser, registerUser, resetPassword, updateProfile, verifyOTP } from "../action/user-action"
 import { toast } from "../../../utils/APIClient"
 
 
@@ -21,7 +21,7 @@ export const UserSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        setUserData :(state, action)=>{
+        setUserData: (state, action) => {
             state.userData = action.payload;
         }
     },
@@ -32,7 +32,7 @@ export const UserSlice = createSlice({
 
         }).addCase(registerUser.fulfilled, (state, action) => {
             sessionStorage.setItem("registration", JSON.stringify(action.payload));
-            toast.success( "User registered")
+            toast.success("User registered")
 
         }).addCase(registerUser.rejected, (state, action: any) => {
             sessionStorage.removeItem("registration");
@@ -40,24 +40,24 @@ export const UserSlice = createSlice({
 
 
         })
-       
+
         builder.addCase(verifyOTP.pending, (state, action) => {
-            state.loading=true
+            state.loading = true
 
         }).addCase(verifyOTP.fulfilled, (state, action) => {
             state.userData = action.payload;
             state.loading = false
             localStorage.setItem("userData", JSON.stringify(action.payload));
-            toast.success( action.payload?.message||"OTP verified")
+            toast.success(action.payload?.message || "OTP verified")
             sessionStorage.removeItem("registration");
-            
+
         }).addCase(verifyOTP.rejected, (state, action: any) => {
             toast.error(action.payload?.message || "OTP verification failed")
             state.loading = false
         })
-        
+
         builder.addCase(loginUser.pending, (state, action) => {
-            state.loading=true
+            state.loading = true
 
         }).addCase(loginUser.fulfilled, (state, action) => {
             console.log("loginUser.fulfilled", action.payload);
@@ -65,31 +65,42 @@ export const UserSlice = createSlice({
             // state.data = action.payload;
             state.loading = false
             localStorage.setItem("userData", JSON.stringify(action.payload));
-            toast.success( action.payload?.message||"Logged in")
+            toast.success(action.payload?.message || "Logged in")
             // sessionStorage.removeItem("registration");
         }).addCase(loginUser.rejected, (state, action: any) => {
             toast.error(action.payload?.message || "Failed to login")
             state.loading = false
         })
-        
+
         builder.addCase(forgotPassword.pending, (state, action) => {
         }).addCase(forgotPassword.fulfilled, (state, action) => {
-            toast.success( action.payload?.message)
+            toast.success(action.payload?.message)
         }).addCase(forgotPassword.rejected, (state, action: any) => {
             toast.error(action.payload?.message)
         })
-        
+
         builder.addCase(resetPassword.pending, (state, action) => {
         }).addCase(resetPassword.fulfilled, (state, action) => {
-            toast.success( action.payload?.message)
+            toast.success(action.payload?.message)
         }).addCase(resetPassword.rejected, (state, action: any) => {
             toast.error(action.payload?.message)
+        })
+
+        builder.addCase(updateProfile.pending, (state) => {
+            state.loading = true;
+        }).addCase(updateProfile.fulfilled, (state, action) => {
+            state.userData = action.payload;
+            state.loading = false;
+            toast.success("Profile updated successfully");
+        }).addCase(updateProfile.rejected, (state, action: any) => {
+            state.loading = false;
+            toast.error(action.payload?.message || "Failed to update profile");
         })
     }
 
 })
 
-export const { setUserData } = UserSlice.actions; 
+export const { setUserData } = UserSlice.actions;
 
 export default UserSlice.reducer;
 

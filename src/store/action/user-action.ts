@@ -83,4 +83,21 @@ export const loginUser = createAsyncThunk(
     }
 );
 
-
+export const updateProfile = createAsyncThunk(
+    "updateProfile",
+    async (payload: { name?: string; email?: string }, { rejectWithValue }) => {
+        try {
+            const response = await apiClient.PUT("/user/update", payload);
+            const updatedUser = response.data?.data;
+            // Sync localStorage so other listeners pick up the change
+            if (updatedUser) {
+                localStorage.setItem("userData", JSON.stringify(updatedUser));
+                window.dispatchEvent(new Event("local-storage"));
+            }
+            return updatedUser;
+        } catch (error: any) {
+            const message = error.response?.data || { message: "Failed to update profile" };
+            return rejectWithValue(message);
+        }
+    }
+);

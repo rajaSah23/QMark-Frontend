@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from '@mantine/form';
-import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, MultiSelect, Group } from '@mantine/core';
+import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, MultiSelect, Group, SegmentedControl } from '@mantine/core';
 import SubjectTopicDropdown from '../../components/dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
@@ -65,13 +65,13 @@ const CreateQuiz = () => {
             settings: {
                 shuffleQuestions: values.shuffleQuestions,
                 shuffleOptions: values.shuffleOptions,
-                timeLimit: values.timeLimit > 0 ? values.timeLimit : null
+                timeLimit: values.timeLimit > 0 ? values.timeLimit : 0
             }
         };
 
         if (activeTab === 'filters') {
             payload.filters = {
-                limit: values.limit
+                limit: values.limit 
             };
             if (values.subject) payload.filters.subject = values.subject;
             if (values.topic) payload.filters.topic = values.topic;
@@ -86,6 +86,8 @@ const CreateQuiz = () => {
             }
         });
     };
+
+    
 
     // Prepare manual selection options from loaded questions
     const questionOptions = (mcqData || []).map((q: any) => ({
@@ -148,10 +150,31 @@ const CreateQuiz = () => {
                                     topicError={null}
                                     openSubjectForm={open}
                                 />
-                                <TextInput
+                                {/* <TextInput
                                     label="Difficulty"
                                     placeholder="easy, medium, or hard"
                                     {...form.getInputProps('difficulty')}
+                                /> */}
+                                <label className="text-sm font-medium text-gray-400">Difficulty</label>
+                                <SegmentedControl
+                                    size="xs"
+                                    radius="xl"
+                                    withItemsBorders={false}
+                                    color={
+                                        form.getValues().difficulty === "easy"
+                                            ? "green"
+                                            : form.getValues().difficulty === "medium"
+                                                ? "yellow"
+                                                : "red"
+                                    }
+                                    value={form.getValues().difficulty}
+                                    onChange={(val) => form.setValues({ difficulty: val })}
+                                    data={[
+                                        { label: 'All', value: '' },
+                                        { label: 'Easy', value: 'easy' },
+                                        { label: 'Medium', value: 'medium' },
+                                        { label: 'Hard', value: 'hard' },
+                                    ]}
                                 />
                                 <NumberInput
                                     label="Number of Questions"

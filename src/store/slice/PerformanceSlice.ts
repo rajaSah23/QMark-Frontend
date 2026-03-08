@@ -16,7 +16,9 @@ export interface PerformanceState {
     subjectWisePerformance: any[];
     difficultyWisePerformance: any[];
     performanceSummary: any | null;
-    loading: boolean;
+    // Separate loading flags to avoid race conditions between parallel fetches
+    loadingStats: boolean;   // daily, quiz, subject, difficulty
+    loadingMeta: boolean;    // streak, summary
     error: any;
     selectedDateRange: {
         startDate: string;
@@ -31,7 +33,8 @@ const initialState: PerformanceState = {
     subjectWisePerformance: [],
     difficultyWisePerformance: [],
     performanceSummary: null,
-    loading: false,
+    loadingStats: false,
+    loadingMeta: false,
     error: null,
     selectedDateRange: null,
 };
@@ -54,14 +57,14 @@ export const PerformanceSlice = createSlice({
         // getDailyActivityStats
         builder
             .addCase(getDailyActivityStats.pending, (state) => {
-                state.loading = true;
+                state.loadingStats = true;
             })
             .addCase(getDailyActivityStats.fulfilled, (state, action) => {
-                state.dailyActivityStats = action.payload || [];
-                state.loading = false;
+                state.dailyActivityStats = action.payload ?? [];
+                state.loadingStats = false;
             })
             .addCase(getDailyActivityStats.rejected, (state, action: any) => {
-                state.loading = false;
+                state.loadingStats = false;
                 state.error = action.payload;
                 const errorMsg =
                     action?.payload?.message || "Failed to fetch daily activity";
@@ -71,14 +74,14 @@ export const PerformanceSlice = createSlice({
         // getStreakRecord
         builder
             .addCase(getStreakRecord.pending, (state) => {
-                state.loading = true;
+                state.loadingMeta = true;
             })
             .addCase(getStreakRecord.fulfilled, (state, action) => {
                 state.streakRecord = action.payload;
-                state.loading = false;
+                state.loadingMeta = false;
             })
             .addCase(getStreakRecord.rejected, (state, action: any) => {
-                state.loading = false;
+                state.loadingMeta = false;
                 state.error = action.payload;
                 const errorMsg =
                     action?.payload?.message || "Failed to fetch streak record";
@@ -88,14 +91,14 @@ export const PerformanceSlice = createSlice({
         // getQuizPerformanceStats
         builder
             .addCase(getQuizPerformanceStats.pending, (state) => {
-                state.loading = true;
+                state.loadingStats = true;
             })
             .addCase(getQuizPerformanceStats.fulfilled, (state, action) => {
-                state.quizPerformanceStats = action.payload || [];
-                state.loading = false;
+                state.quizPerformanceStats = action.payload ?? [];
+                state.loadingStats = false;
             })
             .addCase(getQuizPerformanceStats.rejected, (state, action: any) => {
-                state.loading = false;
+                state.loadingStats = false;
                 state.error = action.payload;
                 const errorMsg =
                     action?.payload?.message ||
@@ -106,16 +109,16 @@ export const PerformanceSlice = createSlice({
         // getSubjectWisePerformance
         builder
             .addCase(getSubjectWisePerformance.pending, (state) => {
-                state.loading = true;
+                state.loadingStats = true;
             })
             .addCase(getSubjectWisePerformance.fulfilled, (state, action) => {
-                state.subjectWisePerformance = action.payload || [];
-                state.loading = false;
+                state.subjectWisePerformance = action.payload ?? [];
+                state.loadingStats = false;
             })
             .addCase(
                 getSubjectWisePerformance.rejected,
                 (state, action: any) => {
-                    state.loading = false;
+                    state.loadingStats = false;
                     state.error = action.payload;
                     const errorMsg =
                         action?.payload?.message ||
@@ -127,16 +130,16 @@ export const PerformanceSlice = createSlice({
         // getDifficultyWisePerformance
         builder
             .addCase(getDifficultyWisePerformance.pending, (state) => {
-                state.loading = true;
+                state.loadingStats = true;
             })
             .addCase(getDifficultyWisePerformance.fulfilled, (state, action) => {
-                state.difficultyWisePerformance = action.payload || [];
-                state.loading = false;
+                state.difficultyWisePerformance = action.payload ?? [];
+                state.loadingStats = false;
             })
             .addCase(
                 getDifficultyWisePerformance.rejected,
                 (state, action: any) => {
-                    state.loading = false;
+                    state.loadingStats = false;
                     state.error = action.payload;
                     const errorMsg =
                         action?.payload?.message ||
@@ -148,14 +151,14 @@ export const PerformanceSlice = createSlice({
         // getPerformanceSummary
         builder
             .addCase(getPerformanceSummary.pending, (state) => {
-                state.loading = true;
+                state.loadingMeta = true;
             })
             .addCase(getPerformanceSummary.fulfilled, (state, action) => {
                 state.performanceSummary = action.payload;
-                state.loading = false;
+                state.loadingMeta = false;
             })
             .addCase(getPerformanceSummary.rejected, (state, action: any) => {
-                state.loading = false;
+                state.loadingMeta = false;
                 state.error = action.payload;
                 const errorMsg =
                     action?.payload?.message ||
