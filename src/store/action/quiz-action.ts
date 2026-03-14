@@ -11,9 +11,9 @@ export const createQuiz = createAsyncThunk("createQuiz", async (payload: any, { 
     }
 });
 
-export const getQuizzes = createAsyncThunk("getQuizzes", async (_, { rejectWithValue }) => {
+export const getQuizzes = createAsyncThunk("getQuizzes", async (query: any = {}, { rejectWithValue }) => {
     try {
-        const response = await apiClient.GET("/quiz");
+        const response = await apiClient.GET("/quiz", query);
         return response.data?.data;
     } catch (error: any) {
         console.error("getQuizzes error:", error?.response?.data || error?.message || error);

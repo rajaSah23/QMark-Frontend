@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from '@mantine/form';
-import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, Group, SegmentedControl, Text } from '@mantine/core';
+import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, Group, SegmentedControl, Text, Select } from '@mantine/core';
 import SubjectTopicDropdown from '../../components/dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
@@ -9,10 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import AddSubject from '../question/AddSubject';
 import ManualQuestionPicker from './ManualQuestionPicker';
+import { getSubjectList } from '../../store/action/master-action';
 
 type CreateQuizFormValues = {
   title: string;
   description: string;
+  quizSubject: string;
   shuffleQuestions: boolean;
   shuffleOptions: boolean;
   timeLimit: number;
@@ -30,12 +32,20 @@ const CreateQuiz = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<string | null>('filters');
     const { loadingAction } = useSelector((state: RootState) => state.quiz as any);
+    const { subjectList } = useSelector((state: RootState) => state.master as any);
     const [opened, { open, close }] = useDisclosure(false);
+
+    React.useEffect(() => {
+        if (!subjectList || subjectList.length === 0) {
+            dispatch(getSubjectList(undefined as any));
+        }
+    }, [dispatch, subjectList]);
 
     const form = useForm<CreateQuizFormValues>({
         initialValues: {
             title: '',
             description: '',
+            quizSubject: '',
             shuffleQuestions: true,
             shuffleOptions: false,
             timeLimit: 0,
@@ -62,6 +72,7 @@ const CreateQuiz = () => {
         const payload: any = {
             title: values.title,
             description: values.description,
+            subject: values.quizSubject || null,
             settings: {
                 shuffleQuestions: values.shuffleQuestions,
                 shuffleOptions: values.shuffleOptions,
@@ -104,6 +115,18 @@ const CreateQuiz = () => {
                             label="Description"
                             placeholder="Optional description"
                             {...form.getInputProps('description')}
+                        />
+                        <Select
+                            label="Quiz Subject Category"
+                            placeholder="No subject category"
+                            data={[
+                                { label: 'No subject category', value: '' },
+                                ...(subjectList?.map((subject: any) => ({
+                                    label: subject.subject,
+                                    value: subject._id
+                                })) || [])
+                            ]}
+                            {...form.getInputProps('quizSubject')}
                         />
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-mine-shaft-700 rounded-md">

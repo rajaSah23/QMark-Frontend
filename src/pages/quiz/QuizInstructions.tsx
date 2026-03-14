@@ -28,6 +28,9 @@ const QuizInstructions = () => {
 
             <Card className="bg-mine-shaft-900 border border-mine-shaft-700 p-6">
                 <Group gap="sm" mb="lg">
+                    <Badge color="gray" variant="light">
+                        {currentQuiz.subject?.subject || 'No subject'}
+                    </Badge>
                     <Badge color="blue" variant="light">{currentQuiz.questions?.length || 0} Questions</Badge>
                     <Badge color="cyan" variant="light">
                         {currentQuiz.settings?.timeLimit ? `${currentQuiz.settings.timeLimit} minutes` : 'No time limit'}
@@ -48,12 +51,17 @@ const QuizInstructions = () => {
                 <Text mt="xl" c="dimmed">
                     Click start only when you are ready to continue in fullscreen mode.
                 </Text>
+                {!currentQuiz.active && (
+                    <Text mt="sm" c="red.3">
+                        This quiz is currently inactive, so new attempts are disabled.
+                    </Text>
+                )}
 
                 <Group justify="flex-end" mt="xl">
                     <Button variant="subtle" color="gray" onClick={() => navigate(`/quiz/${quizId}`)}>
                         Back to Quiz Detail
                     </Button>
-                    <Button color="green" onClick={() => navigate(`/quiz/${quizId}/attempt`)}>
+                    <Button color="green" onClick={() => navigate(`/quiz/${quizId}/attempt`)} disabled={!currentQuiz.active}>
                         Start Quiz
                     </Button>
                 </Group>
