@@ -77,7 +77,7 @@ const QuizDetail = () => {
                     size="xl" 
                     color="green" 
                     leftSection={<IconPlayerPlay size={24} />}
-                    onClick={() => navigate(`/quiz/${currentQuiz._id}/attempt`)}
+                    onClick={() => navigate(`/quiz/${currentQuiz._id}/instructions`)}
                     disabled={!currentQuiz.active}
                 >
                     Start Quiz Now

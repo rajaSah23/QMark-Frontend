@@ -1,102 +1,118 @@
+import { Link } from 'react-router-dom';
+import {
+  IconBulb,
+  IconLayersIntersect,
+  IconTargetArrow,
+} from '@tabler/icons-react';
+import ScrollReveal from '../../components/ScrollReveal';
+
+const highlights = [
+  {
+    icon: IconBulb,
+    title: 'The problem',
+    description: 'Important questions get lost across too many places.',
+  },
+  {
+    icon: IconLayersIntersect,
+    title: 'The solution',
+    description: 'QMark keeps practice and revision in one flow.',
+  },
+  {
+    icon: IconTargetArrow,
+    title: 'The result',
+    description: 'Cleaner preparation and faster repeat practice.',
+  },
+];
+
+const capabilities = [
+  'Build and manage your own question library',
+  'Filter questions subject-wise and topic-wise',
+  'Attempt quizzes with timer and review control',
+  'Track activity and quiz performance over time',
+  'Inspect question-level interaction patterns',
+  'Revisit weak or important questions faster',
+];
+
 const AboutUs = () => {
   return (
-    <div className="min-h-screen text-bright-sun-50 p-6">
-      <div className="mx-auto p-6 bg-mine-shaft-950 rounded-md shadow-lg">
-        {/* Header Section */}
-        <h1 className="text-4xl font-extrabold mb-6 text-center text-bright-sun-50">
-          About Us
-        </h1>
-        <p className="text-mine-shaft-300 text-center mb-8">
-          We're a passionate team on a mission to empower competitive exam aspirants by solving one of their biggest pain points — storing and revising important and tricky MCQs. Our platform helps students easily mark, organize, and revisit questions that matter the most, making their preparation smarter and more focused.
-        </p>
-
-        {/* Core Values Section */}
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold text-bright-sun-50 mb-4">Our Core Values</h2>
-          <ul className="list-disc list-inside space-y-2 text-mine-shaft-300">
-            <li>
-              <span className="text-bright-sun-400 font-semibold">Efficiency:</span>
-              Helping students make the most out of their study time.
-            </li>
-            <li>
-              <span className="text-bright-sun-400 font-semibold">Simplicity:</span>
-              Making MCQ storage and revision effortless and user-friendly.
-            </li>
-            <li>
-              <span className="text-bright-sun-400 font-semibold">Personalization:</span>
-              Allowing students to track and revise based on their own strengths and weaknesses.
-            </li>
-            <li>
-              <span className="text-bright-sun-400 font-semibold">Focus:</span>
-              Encouraging students to concentrate on quality over quantity.
-            </li>
-          </ul>
-        </div>
-
-        {/* Our Journey Section */}
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold text-bright-sun-50 mb-4">Our Journey</h2>
-          <p className="text-mine-shaft-300 mb-4">
-            The idea started with a simple observation — students solve hundreds of MCQs daily, but often forget the few that truly challenge them. We built a platform where those important questions could be saved, sorted, and revisited with ease. Today, we’re growing into a trusted tool for students across the country who want to prepare smart, not just hard.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {/* Milestone Cards */}
-            <div className="p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-              <h3 className="text-lg font-bold text-bright-sun-50 mb-2">2023</h3>
-              <p className="text-mine-shaft-300">
-                Conceptualized the idea after observing real challenges faced by students during MCQ preparation.
-              </p>
-            </div>
-            <div className="p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-              <h3 className="text-lg font-bold text-bright-sun-50 mb-2">2024</h3>
-              <p className="text-mine-shaft-300">
-                Launched the first version of the platform with bookmarking and topic-wise sorting features.
-              </p>
-            </div>
-            <div className="p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-              <h3 className="text-lg font-bold text-bright-sun-50 mb-2">2025</h3>
-              <p className="text-mine-shaft-300">
-                Gained a community of passionate learners and launched revision tracking and notes features.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Meet the Team Section */}
-        <div className="mb-10">
-          <h2 className="text-2xl font-bold text-bright-sun-50 mb-4">Meet the Team</h2>
-          <div className="w-full py-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
-              {/* Team Member Cards */}
-              <div className="text-center p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-                <div className="w-20 h-20 mx-auto bg-bright-sun-400 rounded-full mb-3"></div>
-                <h3 className="text-lg font-bold text-bright-sun-50">Raja Sah</h3>
-                <p className="text-mine-shaft-300">Founder & Developer</p>
-              </div>
-              <div className="text-center p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-                <div className="w-20 h-20 mx-auto bg-bright-sun-400 rounded-full mb-3"></div>
-                <h3 className="text-lg font-bold text-bright-sun-50">Santraj</h3>
-                <p className="text-mine-shaft-300">UI/UX Designer</p>
-              </div>
-              <div className="text-center p-4 bg-mine-shaft-800 rounded-md shadow hover:cursor-pointer hover:bg-mine-shaft-700">
-                <div className="w-20 h-20 mx-auto bg-bright-sun-400 rounded-full mb-3"></div>
-                <h3 className="text-lg font-bold text-bright-sun-50">Vikas Kumar</h3>
-                <p className="text-mine-shaft-300">Backend Engineer</p>
-              </div>
+    <div className="min-h-screen bg-mine-shaft-950 text-white">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+        <ScrollReveal className="grid items-center gap-10 rounded-3xl border border-mine-shaft-800 bg-mine-shaft-900/60 px-6 py-8 sm:px-8 lg:grid-cols-2 lg:px-10">
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-bright-sun-300">About QMark</p>
+            <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
+              QMark is built to make MCQ preparation cleaner, more trackable, and easier to repeat.
+            </h1>
+            <p className="text-sm leading-7 text-mine-shaft-300 sm:text-base">
+              Instead of treating questions, quizzes, and revision as separate tasks, QMark connects them into one
+              workflow so users can practice with more clarity and less friction.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/questions"
+                className="inline-flex items-center justify-center rounded-xl bg-bright-sun-400 px-5 py-3 text-sm font-semibold text-mine-shaft-950 transition hover:bg-bright-sun-300"
+              >
+                Explore Questions
+              </Link>
+              <Link
+                to="/quiz"
+                className="inline-flex items-center justify-center rounded-xl border border-mine-shaft-700 bg-mine-shaft-950 px-5 py-3 text-sm font-medium text-white transition hover:border-mine-shaft-600 hover:bg-mine-shaft-900"
+              >
+                Go to Quiz
+              </Link>
             </div>
           </div>
 
+          <div className="flex justify-center lg:justify-end">
+            <img
+              src="/man-with-laptop.png"
+              alt="About QMark"
+              className="motion-float w-full max-w-xs sm:max-w-sm md:max-w-md"
+            />
+          </div>
+        </ScrollReveal>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {highlights.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <ScrollReveal
+                key={item.title}
+                className="rounded-2xl border border-mine-shaft-800 bg-mine-shaft-900/50 p-5"
+                delay={index * 110}
+              >
+                <div className="mb-4 inline-flex rounded-2xl bg-bright-sun-400/12 p-3 text-bright-sun-300">
+                  <Icon size={20} />
+                </div>
+                <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-mine-shaft-300">{item.description}</p>
+              </ScrollReveal>
+            );
+          })}
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-10">
-          <h3 className="text-2xl font-bold text-bright-sun-50 mb-4">
-            Want to make your preparation smarter?
-          </h3>
-          <button className="px-6 py-2 bg-bright-sun-500 text-mine-shaft-900 font-semibold rounded-md hover:bg-bright-sun-400 focus:ring-2 focus:ring-bright-sun-500 hover:cursor-pointer">
-            Start Saving MCQs
-          </button>
-        </div>
+        <ScrollReveal className="grid gap-6 rounded-3xl border border-mine-shaft-800 bg-mine-shaft-900/50 px-6 py-8 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:px-10">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-bright-sun-300">What the platform covers</p>
+            <h2 className="mt-2 text-3xl font-bold text-white">A practical workspace for repeat practice.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-mine-shaft-300 sm:text-base">
+              QMark is useful when preparation depends on collecting the right questions, attempting regularly, and
+              looking back at your own performance without maintaining separate systems.
+            </p>
+          </div>
+
+          <div className="grid gap-3">
+            {capabilities.map((item, index) => (
+              <ScrollReveal
+                key={item}
+                className="rounded-2xl border border-mine-shaft-800 bg-mine-shaft-950/70 px-4 py-3 text-sm leading-6 text-mine-shaft-200"
+                delay={index * 90}
+              >
+                {item}
+              </ScrollReveal>
+            ))}
+          </div>
+        </ScrollReveal>
       </div>
     </div>
   );

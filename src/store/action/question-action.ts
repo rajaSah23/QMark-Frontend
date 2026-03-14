@@ -3,12 +3,6 @@ import { getUserData } from "../../../utils/Utility";
 import apiClient from "../../../utils/APIClient";
 
 export const getQuestion = createAsyncThunk("getQuestion", async (query: any, { rejectWithValue }) => {
-    // console.log(query);
-
-    // const userData = getUserData();
-    // const jwtToken = `Bearer ${userData?.token}`;
-
-
     try {
         const response = await apiClient.GET("mcq", query);
         console.log(response.data?.data);
@@ -54,7 +48,7 @@ export const deleteQuestion = createAsyncThunk("deleteQuestion", async (id: any,
 
 export const updateQuestion = createAsyncThunk("updateQuestion", async (payload: any, { rejectWithValue }) => {
     try {
-        const response = await apiClient.PATCH("mcq", payload);
+        const response = await apiClient.PUT("mcq", payload);
         console.log("updateQuestion", response.data?.data);
         return response.data?.data;
     } catch (error: any) {
@@ -63,7 +57,26 @@ export const updateQuestion = createAsyncThunk("updateQuestion", async (payload:
     }
 })
 
-export default { getQuestion, postQuestion, updateQuestion }
+export const trackQuestionOptionClick = createAsyncThunk("trackQuestionOptionClick", async ({ questionId, selectedAnswer }: any, { rejectWithValue }) => {
+    try {
+        const response = await apiClient.POST(`/mcq/${questionId}/option-click`, { selectedAnswer });
+        return response.data?.data;
+    } catch (error: any) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data || "Failed to track question interaction");
+    }
+})
 
+export const getQuestionInteractionSummary = createAsyncThunk("getQuestionInteractionSummary", async (query: any, { rejectWithValue }) => {
+    try {
+        const response = await apiClient.GET("/mcq/analytics/summary", query);
+        return response.data?.data;
+    } catch (error: any) {
+        console.log(error);
+        return rejectWithValue(error?.response?.data || "Failed to fetch question interaction analytics");
+    }
+})
+
+export default { getQuestion, postQuestion, updateQuestion }
 
 

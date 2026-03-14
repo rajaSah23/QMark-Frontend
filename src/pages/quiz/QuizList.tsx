@@ -68,7 +68,7 @@ const QuizList = () => {
                                         size="xs" 
                                         color="green" 
                                         leftSection={<IconPlayerPlay size={14} />}
-                                        onClick={() => navigate(`/quiz/${quiz._id}/attempt`)}
+                                        onClick={() => navigate(`/quiz/${quiz._id}/instructions`)}
                                     >
                                         Start
                                     </Button>

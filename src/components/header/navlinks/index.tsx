@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 interface NavLinksProps {
     onLinkClick?: () => void;
@@ -6,16 +6,12 @@ interface NavLinksProps {
 
 const NavLinks = ({ onLinkClick }: NavLinksProps) => {
     const location = useLocation();
-    const navigate = useNavigate();
 
     const links = [
         { name: "Home", url: "" },
         { name: "Questions", url: "questions" },
         { name: "Bookmarks", url: "questions/bookmarks" },
         { name: "Quiz", url: "quiz" },
-        { name: "Activity", url: "dashboard/activity" },
-        { name: "Performance", url: "dashboard/quiz-performance" },
-        { name: "About", url: "about" },
     ];
 
     const isActive = (url: string) => {

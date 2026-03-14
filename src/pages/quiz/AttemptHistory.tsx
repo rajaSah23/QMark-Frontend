@@ -38,7 +38,7 @@ const AttemptHistory = () => {
                         Attempt History: {currentQuiz?.title || 'Loading...'}
                     </h1>
                 </div>
-                <Button color="green" onClick={() => navigate(`/quiz/${quizId}/attempt`)}>
+                <Button color="green" onClick={() => navigate(`/quiz/${quizId}/instructions`)}>
                     Take Quiz Again
                 </Button>
             </Group>
@@ -46,7 +46,7 @@ const AttemptHistory = () => {
             {attempts?.length === 0 ? (
                 <Card className="bg-mine-shaft-800 text-center py-12 border-none">
                     <Text size="lg" c="dimmed">You haven't taken this quiz yet.</Text>
-                    <Button mt="md" color="green" onClick={() => navigate(`/quiz/${quizId}/attempt`)}>
+                    <Button mt="md" color="green" onClick={() => navigate(`/quiz/${quizId}/instructions`)}>
                         Start First Attempt
                     </Button>
                 </Card>

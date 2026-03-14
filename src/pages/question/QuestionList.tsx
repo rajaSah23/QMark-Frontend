@@ -1,4 +1,4 @@
-import { Grid, Loader, SegmentedControl } from '@mantine/core';
+import { Button, Grid, Loader, SegmentedControl } from '@mantine/core';
 import McqCard from '../../components/cards/MCQCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -6,7 +6,7 @@ import { AppDispatch } from '../../store';
 import ReusableModal from '../../components/modal/ReusableModal';
 // import AddQuestion from './AddQuestion';
 import { getQuestion } from '../../store/action/question-action';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 // import { toast } from '../../../utils/APIClient';
 import { useInView } from 'react-intersection-observer';
 import { clearState } from '../../store/slice/QuestionSlice';
@@ -14,6 +14,7 @@ import SearchBox from '../../components/searchBox/SearchBox';
 
 const QuestionList = () => {
     const dispatch = useDispatch<AppDispatch>();  // ✅ Typed dispatch
+    const navigate = useNavigate();
     const { data, loading, total, page, totalPages } = useSelector((state: any) => state.questions);
     const [searchParams, setSearchParams] = useSearchParams()
     const { ref, inView } = useInView();
@@ -71,6 +72,11 @@ const QuestionList = () => {
                 <div className=' flex justify-between items-center gap-3'>
                     {isBookmarkPage ? null : <ReusableModal title={getTitle()} />}
                     <SearchBox />
+                    {!isBookmarkPage && (
+                        <Button variant="light" color="blue" onClick={() => navigate('/questions/analytics')}>
+                            Question Analytics
+                        </Button>
+                    )}
 
                 </div>
                 <div className=' flex justify-between items-center'>

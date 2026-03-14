@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from '@mantine/form';
-import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, MultiSelect, Group, SegmentedControl } from '@mantine/core';
+import { TextInput, Textarea, Button, Switch, NumberInput, Paper, Tabs, Group, SegmentedControl, Text } from '@mantine/core';
 import SubjectTopicDropdown from '../../components/dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
@@ -8,6 +8,7 @@ import { createQuiz } from '../../store/action/quiz-action';
 import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import AddSubject from '../question/AddSubject';
+import ManualQuestionPicker from './ManualQuestionPicker';
 
 type CreateQuizFormValues = {
   title: string;
@@ -29,7 +30,6 @@ const CreateQuiz = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<string | null>('filters');
     const { loadingAction } = useSelector((state: RootState) => state.quiz as any);
-    const { data: mcqData } = useSelector((state: RootState) => state.questions as any);
     const [opened, { open, close }] = useDisclosure(false);
 
     const form = useForm<CreateQuizFormValues>({
@@ -86,14 +86,6 @@ const CreateQuiz = () => {
             }
         });
     };
-
-    
-
-    // Prepare manual selection options from loaded questions
-    const questionOptions = (mcqData || []).map((q: any) => ({
-        value: q._id,
-        label: q.question.replace(/<[^>]+>/g, '').substring(0, 100) + '...' // Strip HTML for dropdown
-    }));
 
     return (
         <div className="max-w-3xl mx-auto space-y-6">
@@ -186,18 +178,13 @@ const CreateQuiz = () => {
                         </Tabs.Panel>
 
                         <Tabs.Panel value="manual" pt="xl">
-                            <MultiSelect
-                                label="Select Questions"
-                                placeholder="Search and select questions"
-                                data={questionOptions}
-                                searchable
-                                clearable
-                                limit={20}
-                                {...form.getInputProps('questionIds')}
+                            <ManualQuestionPicker
+                                value={form.values.questionIds}
+                                onChange={(questionIds) => form.setFieldValue('questionIds', questionIds)}
                             />
-                            <p className="text-sm text-dimmed mt-2">
-                                Note: Only questions currently loaded in memory will appear here. Navigate to the Questions tab first to load more.
-                            </p>
+                            {form.errors.questionIds && (
+                                <Text c="red" size="sm" mt="sm">{form.errors.questionIds}</Text>
+                            )}
                         </Tabs.Panel>
                     </Tabs>
 

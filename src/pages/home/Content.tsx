@@ -1,56 +1,96 @@
-import { Input } from '@mantine/core'
-import { IconSearch } from '@tabler/icons-react'
+import { Link } from 'react-router-dom';
+import {
+  IconBookmark,
+  IconChartBar,
+  IconChecklist,
+} from '@tabler/icons-react';
+import ScrollReveal from '../../components/ScrollReveal';
+
+const quickStats = [
+  {
+    label: 'Save',
+    value: 'Important MCQs',
+    icon: IconBookmark,
+  },
+  {
+    label: 'Practice',
+    value: 'Timed quiz flow',
+    icon: IconChecklist,
+  },
+  {
+    label: 'Track',
+    value: 'Performance patterns',
+    icon: IconChartBar,
+  },
+];
 
 const Content = () => {
   return (
-    <div className="flex flex-col-reverse lg:flex-row items-center justify-between px-6 md:px-12 pt-16 text-white gap-10">
-      {/* Left Content */}
-      <div className="flex flex-col justify-center gap-4 w-full lg:w-1/2">
-        <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-snug">
-          Your intelligent <div></div> <span className="text-bright-sun-400">Self Study</span> partner
-        </h1>
-        <p className="text-mine-shaft-300">
-          Create your own Question Bank — For yourself. By yourself.
-        </p>
+    <ScrollReveal className="px-6 pt-14 text-white md:px-12">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 rounded-3xl border border-mine-shaft-800 bg-mine-shaft-900/60 px-6 py-8 sm:px-8 lg:grid-cols-2 lg:px-10 lg:py-10">
+        <div className="flex flex-col gap-5">
+          <span className="w-fit rounded-full border border-bright-sun-400/30 bg-bright-sun-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-bright-sun-300">
+            QMark Workspace
+          </span>
 
-        {/* Input Row */}
-        <div className="flex flex-col sm:flex-row gap-4 my-8">
-          <div className="bg-mine-shaft-900 rounded-md p-3 w-full sm:w-auto">
-            <label className="text-sm text-mine-shaft-400">Subject</label>
-            <Input
-              variant="unstyled"
-              size="md"
-              placeholder="Eg. Physics, Math, etc."
-              className="text-white"
-            />
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+              Your intelligent <span className="text-bright-sun-400">self-study</span> partner.
+            </h1>
+            <p className="max-w-2xl text-sm leading-7 text-mine-shaft-300 sm:text-base">
+              Build your question bank, attempt quizzes with structure, and revise from clear signals instead of scattered notes.
+            </p>
           </div>
 
-          <div className="bg-mine-shaft-900 rounded-md p-3 w-full sm:w-auto">
-            <label className="text-sm text-mine-shaft-400">Topic</label>
-            <Input
-              variant="unstyled"
-              size="md"
-              placeholder="Eg. Algebra, Mechanics..."
-              className="text-white"
-            />
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              to="/questions"
+              className="inline-flex items-center justify-center rounded-xl bg-bright-sun-400 px-5 py-3 text-sm font-semibold text-mine-shaft-950 transition hover:bg-bright-sun-300"
+            >
+              Explore Questions
+            </Link>
+            <Link
+              to="/quiz"
+              className="inline-flex items-center justify-center rounded-xl border border-mine-shaft-700 bg-mine-shaft-950 px-5 py-3 text-sm font-medium text-white transition hover:border-mine-shaft-600 hover:bg-mine-shaft-900"
+            >
+              Start Quiz
+            </Link>
           </div>
 
-          <button className="bg-bright-sun-400 p-3 rounded-md w-full sm:w-auto flex items-center justify-center hover:bg-bright-sun-300 transition">
-            <IconSearch className="w-6 h-6 text-mine-shaft-950" />
-          </button>
+          <div className="grid gap-3 pt-2 sm:grid-cols-3">
+            {quickStats.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <ScrollReveal
+                  key={item.label}
+                  className="rounded-2xl border border-mine-shaft-800 bg-mine-shaft-950/70 p-4"
+                  delay={index * 100}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-bright-sun-400/12 p-2 text-bright-sun-300">
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-bright-sun-300">{item.label}</p>
+                      <p className="mt-1 text-sm leading-6 text-mine-shaft-300">{item.value}</p>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex justify-center lg:justify-end">
+          <img
+            src="/banner-image.png"
+            alt="QMark study workspace"
+            className="motion-float w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+          />
         </div>
       </div>
+    </ScrollReveal>
+  );
+};
 
-      {/* Right Image */}
-      <div className="w-full lg:w-1/2 flex justify-center">
-        <img
-          src="/banner-image.png"
-          alt="Banner"
-          className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
-        />
-      </div>
-    </div>
-  )
-}
-
-export default Content
+export default Content;

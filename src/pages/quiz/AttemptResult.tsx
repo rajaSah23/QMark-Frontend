@@ -6,6 +6,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Text, Group, Badge, Loader, RingProgress, Divider } from '@mantine/core';
 import { IconCheck, IconX, IconArrowLeft, IconHistory } from '@tabler/icons-react';
 
+const statusBadgeMap: Record<string, { color: string; label: string }> = {
+    answered: { color: 'green', label: 'Answered' },
+    not_answered: { color: 'orange', label: 'Not Answered' },
+    marked_for_review: { color: 'yellow', label: 'Marked for Review' }
+};
+
 const AttemptResult = () => {
     const { quizId, attemptId } = useParams();
     const navigate = useNavigate();
@@ -35,7 +41,7 @@ const AttemptResult = () => {
         );
     }
 
-    const { score = 0, totalQuestions = 0, percentage = 0, answers = [], quiz } = currentAttempt;
+    const { score = 0, totalQuestions = 0, percentage = 0, answers = [], quiz, answerSummary } = currentAttempt;
     const isPassing = percentage >= 60; // Just an arbitrary passing threshold
 
     return (
@@ -69,6 +75,18 @@ const AttemptResult = () => {
                         <Text size="sm" c="dimmed">Score</Text>
                         <Text size="xl" fw={700}>{score} / {totalQuestions}</Text>
                     </div>
+                    <div>
+                        <Text size="sm" c="dimmed">Answered</Text>
+                        <Text size="xl" fw={700}>{answerSummary?.answered || 0}</Text>
+                    </div>
+                    <div>
+                        <Text size="sm" c="dimmed">Marked for Review</Text>
+                        <Text size="xl" fw={700}>{answerSummary?.markedForReview || 0}</Text>
+                    </div>
+                    <div>
+                        <Text size="sm" c="dimmed">Not Answered</Text>
+                        <Text size="xl" fw={700}>{answerSummary?.notAnswered || 0}</Text>
+                    </div>
                 </Group>
             </Card>
 
@@ -85,26 +103,41 @@ const AttemptResult = () => {
                     return (
                         <Card 
                             key={idx} 
-                            className={`bg-mine-shaft-800 border-l-4 shadow-md ${ans.isCorrect ? 'border-l-green-500' : 'border-l-red-500'}`}
+                            className={`bg-mine-shaft-800 border-l-4 shadow-md ${
+                                !ans.selectedAnswer
+                                    ? 'border-l-orange-500'
+                                    : ans.isCorrect
+                                        ? 'border-l-green-500'
+                                        : 'border-l-red-500'
+                            }`}
                         >
                             <Group justify="space-between" align="flex-start" mb="md">
                                 <Text fw={700} className="text-lg flex-1">
                                     {idx + 1}. <span dangerouslySetInnerHTML={{ __html: questionText }} />
                                 </Text>
-                                {ans.isCorrect ? (
-                                    <Badge color="green" size="lg" leftSection={<IconCheck size={14} />}>Correct</Badge>
-                                ) : (
-                                    <Badge color="red" size="lg" leftSection={<IconX size={14} />}>Incorrect</Badge>
-                                )}
+                                <Group gap="xs">
+                                    <Badge color={statusBadgeMap[ans.status || 'not_answered']?.color || 'gray'} size="lg">
+                                        {statusBadgeMap[ans.status || 'not_answered']?.label || 'Unknown'}
+                                    </Badge>
+                                    {ans.selectedAnswer ? (
+                                        ans.isCorrect ? (
+                                            <Badge color="green" size="lg" leftSection={<IconCheck size={14} />}>Correct</Badge>
+                                        ) : (
+                                            <Badge color="red" size="lg" leftSection={<IconX size={14} />}>Incorrect</Badge>
+                                        )
+                                    ) : (
+                                        <Badge color="gray" size="lg">Not Evaluated</Badge>
+                                    )}
+                                </Group>
                             </Group>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                                <div className={`p-3 rounded-md ${ans.isCorrect ? 'bg-green-900/40 text-green-100' : 'bg-red-900/40 text-red-100'}`}>
+                                <div className={`p-3 rounded-md ${ans.selectedAnswer ? (ans.isCorrect ? 'bg-green-900/40 text-green-100' : 'bg-red-900/40 text-red-100') : 'bg-mine-shaft-900 text-mine-shaft-200'}`}>
                                     <Text size="xs" c="dimmed" className="uppercase font-bold tracking-wider mb-1">Your Answer</Text>
-                                    <Text fw={500}>{ans.selectedAnswer || <span className="italic">Skipped</span>}</Text>
+                                    <Text fw={500}>{ans.selectedAnswer || <span className="italic">Not answered</span>}</Text>
                                 </div>
                                 
-                                {!ans.isCorrect && (
+                                {(!ans.isCorrect || !ans.selectedAnswer) && (
                                     <div className="p-3 bg-green-900/40 text-green-100 rounded-md">
                                         <Text size="xs" color="green.2" className="uppercase font-bold tracking-wider mb-1">Correct Answer</Text>
                                         <Text fw={500}>{correctAnswer || 'Not available'}</Text>

@@ -73,7 +73,7 @@ const MasterSettings = () => {
     return (
         <div className="p-6">
             <Title className="flex justify-between items-center" order={3} mb={20}>
-                Master Settings – Subjects
+                Subject Library
                 <Button size="xs" variant="light" onClick={() => setIsModelOpen(true)}>
                     <IconBorderLeftPlus /> Add Subject
                 </Button>
@@ -309,6 +309,7 @@ const ViewProfile = () => {
                         <Link to="/quiz"><Button variant="light" color="green" size="sm">My Quizzes</Button></Link>
                         <Link to="/dashboard/activity"><Button variant="light" color="orange" size="sm">Activity Dashboard</Button></Link>
                         <Link to="/dashboard/quiz-performance"><Button variant="light" color="grape" size="sm">Performance Dashboard</Button></Link>
+                        <Link to="/questions/analytics"><Button variant="light" color="cyan" size="sm">Question Analytics</Button></Link>
                     </div>
                 </Card>
 

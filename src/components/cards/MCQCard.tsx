@@ -16,7 +16,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { addToBookmarks, deleteQuestion } from '../../store/action/question-action';
+import { addToBookmarks, deleteQuestion, trackQuestionOptionClick } from '../../store/action/question-action';
 import EditQuestion from '../../pages/question/EditQuestion';
 import { Modal } from '@mantine/core';
 
@@ -46,13 +46,13 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
     const { loadingAction} = useSelector((state: any) => state.questions);
 
     interface AnswerState {
-        index: number | null;
+        option: string | null;
         isCorrect: boolean | null;
     }
 
     const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
     const [selectedOption, setSelectedOption] = useState<AnswerState>({
-        index: null,
+        option: null,
         isCorrect: null,
     });
     const [isDeleting, setIsDeleting] = useState(false);
@@ -65,24 +65,24 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
         if (question?.options) {
             const shuffled = [...question.options].sort(() => Math.random() - 0.5);
             setShuffledOptions(shuffled);
-            setSelectedOption({ index: null, isCorrect: null });
+            setSelectedOption({ option: null, isCorrect: null });
         }
-    }, [question]);
+    }, [question?._id]);
 
     // Selection handler
-    const handleOptionClick = (option: string, index: number) => {
-        if (selectedOption.index === index) {
-            // Deselect
-            setSelectedOption({ index: null, isCorrect: null });
-        } else {
-            const isCorrect = option === question?.correctAnswer;
-            setSelectedOption({ index, isCorrect });
+    const handleOptionClick = (option: string) => {
+        if (selectedOption.option === option) {
+            return;
         }
+
+        const isCorrect = option === question?.correctAnswer;
+        setSelectedOption({ option, isCorrect });
+        dispatch(trackQuestionOptionClick({ questionId: question?._id, selectedAnswer: option }));
     };
 
     // Determine color for each option
-    const getOptionColor = (index: number) => {
-        if (index !== selectedOption.index) return 'bg-mine-shaft-900';
+    const getOptionColor = (option: string) => {
+        if (option !== selectedOption.option) return 'bg-mine-shaft-900';
         return selectedOption.isCorrect
             ? 'bg-green-400/20 border-l-4 border-green-400'
             : 'bg-red-400/20 border-l-4 border-red-400';
@@ -173,16 +173,16 @@ export default function McqCard({ qId, question, onToggleSave }: any) {
             <div className="mt-4 flex flex-col gap-2 w-full">
                 {shuffledOptions.map((option, index) => (
                     <Option
-                        key={index}
+                        key={`${question?._id}-${option}`}
                         option={option}
-                        color={getOptionColor(index)}
-                        onClick={() => handleOptionClick(option, index)}
+                        color={getOptionColor(option)}
+                        onClick={() => handleOptionClick(option)}
                     />
                 ))}
             </div>
 
             {/* Explanation (only if correct) */}
-            {selectedOption.index !== null && selectedOption.isCorrect && (
+            {selectedOption.option !== null && selectedOption.isCorrect && (
                 <div className="my-4">
                     <div className="font-bold text-bright-sun-400">Explanation</div>
                     {/* <div>{question?.explanation}</div> */}

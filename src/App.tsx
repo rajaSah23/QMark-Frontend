@@ -14,6 +14,8 @@ import ViewProfile from './pages/profile/index.tsx';
 import { Provider } from 'react-redux';
 import store from './store/index.ts';
 import { Questions } from './pages/question/index.tsx';
+import QuestionAnalyticsPage from './pages/question/QuestionAnalyticsPage.tsx';
+import QuestionInsightDetailPage from './pages/question/QuestionInsightDetailPage.tsx';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import '@mantine/tiptap/styles.css';
@@ -27,6 +29,7 @@ import QuizLayout from './pages/quiz';
 import QuizList from './pages/quiz/QuizList';
 import CreateQuiz from './pages/quiz/CreateQuiz';
 import QuizDetail from './pages/quiz/QuizDetail';
+import QuizInstructions from './pages/quiz/QuizInstructions';
 import QuizAttempt from './pages/quiz/QuizAttempt';
 import AttemptResult from './pages/quiz/AttemptResult';
 import AttemptHistory from './pages/quiz/AttemptHistory';
@@ -43,6 +46,13 @@ const FooterConditional = () => {
   return <FooterLinks />;
 };
 
+const HeaderConditional = () => {
+  const location = useLocation();
+  const hide = location.pathname.includes('/attempt');
+  if (hide) return null;
+  return <Header />;
+};
+
 function App() {
   const theme = createTheme({
     colors: {
@@ -57,14 +67,17 @@ function App() {
         <MantineProvider defaultColorScheme='dark' theme={theme}>
           <Notifications />
           <BrowserRouter>
-            <Header />
+            <HeaderConditional />
             <Routes>
               {/* ✅ Protected Routes */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ViewProfile />} />
+                <Route path="/dashboard" element={<Navigate to="/dashboard/activity" replace />} />
                 <Route path="/dashboard/activity" element={<ActivityDashboard />} />
                 <Route path="/dashboard/quiz-performance" element={<QuizPerformanceDashboard />} />
                 <Route path="/questions" element={<Questions />} />
+                <Route path="/questions/analytics" element={<QuestionAnalyticsPage />} />
+                <Route path="/questions/:questionId" element={<QuestionInsightDetailPage />} />
                 <Route path="/questions/bookmarks" element={<Questions />} />
 
                 {/* Quiz Feature Routes */}
@@ -72,6 +85,7 @@ function App() {
                   <Route index element={<QuizList />} />
                   <Route path="create" element={<CreateQuiz />} />
                   <Route path=":quizId" element={<QuizDetail />} />
+                  <Route path=":quizId/instructions" element={<QuizInstructions />} />
                   <Route path=":quizId/attempt" element={<QuizAttempt />} />
                   <Route path=":quizId/result/:attemptId" element={<AttemptResult />} />
                   <Route path=":quizId/history" element={<AttemptHistory />} />
