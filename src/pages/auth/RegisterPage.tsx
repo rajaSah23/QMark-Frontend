@@ -16,6 +16,9 @@ import { useDispatch } from 'react-redux';
 import { registerUser } from '../../store/action/user-action';
 import { AppDispatch } from '../../store';
 import { toast } from '../../../utils/APIClient';
+import AuthShell from '../../components/auth/AuthShell';
+
+const inputClassName = 'w-full rounded-xl border bg-mine-shaft-800/90 py-3 pl-11 pr-4 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-bright-sun-500';
 
 // Strong password schema
 const schema = yup.object().shape({
@@ -89,23 +92,29 @@ const RegisterPage = () => {
     const strengthLabel = ['Too Weak', 'Weak', 'Fair', 'Strong', 'Very Strong'];
 
     return (
-        <div className="min-h-screen bg-mine-shaft-950 flex items-center justify-center px-4 py-6">
-          <div className="bg-mine-shaft-900 rounded-lg shadow-lg w-full max-w-5xl flex flex-col md:flex-row text-white overflow-hidden">
-            {/* ✅ Image Section */}
-            <div className="flex justify-center items-center p-6 bg-mine-shaft-800">
-              <img
-                src="/signin-banner.png"
-                alt="Banner"
-                className="w-72 sm:w-80 md:w-96 lg:w-[420px]"
-              />
+        <AuthShell
+          title="Create your account"
+          subtitle="Set up your QMark workspace and start organizing questions and quiz practice."
+          asideTitle="Built for repeat practice"
+          asideDescription="Create a personal space where questions, quizzes, and revision stay structured from day one."
+          asidePoints={[
+            'Organize MCQs by subject and topic',
+            'Create custom quizzes anytime',
+            'Track progress with clean review flows',
+          ]}
+          footer={
+            <div className="text-sm text-center text-mine-shaft-300">
+              <p className="flex justify-center items-center gap-1">
+                <IconLogin2 size={16} className="text-bright-sun-400" />
+                <span>
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-bright-sun-400 hover:underline">Login</Link>
+                </span>
+              </p>
             </div>
-      
-            {/* ✅ Register Form Section */}
-            <div className="flex-1 p-6 md:p-8">
-              <h2 className="text-2xl font-semibold mb-6 text-bright-sun-400 text-center">Register</h2>
-      
+          }
+        >
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Full Name */}
                 <div>
                   <label htmlFor="name" className="block mb-1 text-sm text-mine-shaft-200">Full Name</label>
                   <div className="relative">
@@ -117,13 +126,12 @@ const RegisterPage = () => {
                       id="name"
                       placeholder="John Doe"
                       {...register('name')}
-                      className={`w-full pl-10 pr-4 py-2 rounded bg-mine-shaft-800 text-white border ${errors.name ? 'border-red-500' : 'border-mine-shaft-700'} focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.name ? 'border-red-500' : 'border-mine-shaft-700'}`}
                     />
                   </div>
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                 </div>
-      
-                {/* Email */}
+
                 <div>
                   <label htmlFor="email" className="block mb-1 text-sm text-mine-shaft-200">Email</label>
                   <div className="relative">
@@ -135,13 +143,12 @@ const RegisterPage = () => {
                       id="email"
                       placeholder="you@example.com"
                       {...register('email')}
-                      className={`w-full pl-10 pr-4 py-2 rounded bg-mine-shaft-800 text-white border ${errors.email ? 'border-red-500' : 'border-mine-shaft-700'} focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.email ? 'border-red-500' : 'border-mine-shaft-700'}`}
                     />
                   </div>
                   {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                 </div>
-      
-                {/* Password */}
+
                 <div>
                   <label htmlFor="password" className="block mb-1 text-sm text-mine-shaft-200">Password</label>
                   <div className="relative">
@@ -153,7 +160,7 @@ const RegisterPage = () => {
                       id="password"
                       placeholder="••••••••"
                       {...register('password')}
-                      className={`w-full pl-10 pr-10 py-2 rounded bg-mine-shaft-800 text-white border ${errors.password ? 'border-red-500' : 'border-mine-shaft-700'} focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.password ? 'border-red-500' : 'border-mine-shaft-700'} pr-10`}
                     />
                     <button
                       type="button"
@@ -163,8 +170,7 @@ const RegisterPage = () => {
                       {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                     </button>
                   </div>
-      
-                  {/* Password Strength Meter */}
+
                   {passwordValue && (
                     <div className="mt-1">
                       <div className="w-full h-2 rounded bg-mine-shaft-800 overflow-hidden">
@@ -179,8 +185,7 @@ const RegisterPage = () => {
       
                   {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                 </div>
-      
-                {/* Confirm Password */}
+
                 <div>
                   <label htmlFor="confirmPassword" className="block mb-1 text-sm text-mine-shaft-200">Confirm Password</label>
                   <div className="relative">
@@ -192,7 +197,7 @@ const RegisterPage = () => {
                       id="confirmPassword"
                       placeholder="••••••••"
                       {...register('confirmPassword')}
-                      className={`w-full pl-10 pr-10 py-2 rounded bg-mine-shaft-800 text-white border ${errors.confirmPassword ? 'border-red-500' : 'border-mine-shaft-700'} focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.confirmPassword ? 'border-red-500' : 'border-mine-shaft-700'} pr-10`}
                     />
                     <button
                       type="button"
@@ -204,13 +209,12 @@ const RegisterPage = () => {
                   </div>
                   {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
                 </div>
-      
-                {/* Submit Button */}
+
                 <button
                   type="submit"
                   disabled={!isValid || isSubmitting}
-                  className={`w-full flex items-center justify-center gap-2 text-white py-2 rounded transition-colors ${!isValid || isSubmitting
-                    ? 'bg-gray-600 cursor-not-allowed'
+                  className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 text-white transition-colors ${!isValid || isSubmitting
+                    ? 'bg-mine-shaft-700 cursor-not-allowed'
                     : 'bg-bright-sun-500 hover:bg-bright-sun-600'
                     }`}
                 >
@@ -218,20 +222,7 @@ const RegisterPage = () => {
                   Register
                 </button>
               </form>
-      
-              {/* Login Redirect */}
-              <div className="mt-4 text-sm text-center text-mine-shaft-300">
-                <p className="flex justify-center items-center gap-1">
-                  <IconLogin2 size={16} className="text-bright-sun-400" />
-                  <span>
-                    Already have an account?{' '}
-                    <Link to="/login" className="text-bright-sun-400 hover:underline">Login</Link>
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </AuthShell>
       );
       
 };

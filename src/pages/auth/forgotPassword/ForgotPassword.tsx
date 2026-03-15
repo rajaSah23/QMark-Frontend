@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { AppDispatch } from "../../../store";
 import { forgotPassword } from "../../../store/action/user-action";
+import AuthShell from "../../../components/auth/AuthShell";
 // import { forgotPassword } from "../../../store/action/user-action"; ✅ your real action
 
 // ✅ Schema
@@ -18,6 +19,8 @@ const schema = yup.object().shape({
 type ForgotPasswordFormData = {
   email: string;
 };
+
+const inputClassName = 'w-full rounded-xl border bg-mine-shaft-800/90 py-3 pl-11 pr-4 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-bright-sun-500';
 
 const ForgotPassword = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -64,14 +67,29 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mine-shaft-950 flex items-center justify-center px-4">
-      <div className="bg-mine-shaft-900 p-8 rounded-lg shadow-lg w-full max-w-md text-white">
-        <h2 className="text-2xl font-semibold mb-6 text-bright-sun-400 text-center">
-          Forgot Password
-        </h2>
-
+    <AuthShell
+      title="Forgot password?"
+      subtitle="Enter your registered email and we will send a reset link."
+      asideTitle="Fast account recovery"
+      asideDescription="If you lose access, QMark lets you reset credentials without losing your study data and quiz history."
+      asidePoints={[
+        'Reset link sent to your registered email',
+        'Request can be retried after cooldown',
+        'Secure reset flow before returning to login',
+      ]}
+      footer={
+        <div className="text-sm text-center text-mine-shaft-300">
+          <p className="flex justify-center items-center gap-1">
+            <IconLogin2 size={16} className="text-bright-sun-400" />
+            <Link to="/login" className="text-bright-sun-400 hover:underline">
+              Back to Sign in
+            </Link>
+          </p>
+        </div>
+      }
+    >
         {showSuccess && (
-          <div className="mb-4 px-4 py-2 bg-green-100 text-green-800 text-sm rounded text-center">
+          <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-center text-sm text-green-200">
             Email sent successfully! Please check your inbox.
           </div>
         )}
@@ -100,9 +118,9 @@ const ForgotPassword = () => {
                     id="email"
                     placeholder="you@example.com"
                     disabled={loading}
-                    className={`w-full pl-10 pr-4 py-2 rounded bg-mine-shaft-800 text-white border ${
+                    className={`${inputClassName} ${
                       errors.email ? "border-red-500" : "border-mine-shaft-700"
-                    } focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                    }`}
                     onChange={(e) =>
                       field.onChange(e.target.value.replace(/\s+/g, ""))
                     }
@@ -121,7 +139,7 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={timer > 0 || isSubmitting || loading || !isValid}
-            className={`w-full flex items-center justify-center gap-2 text-white py-2 rounded transition-colors ${
+            className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 text-white transition-colors ${
               !isValid || loading || isSubmitting || timer > 0
                 ? "bg-mine-shaft-700 cursor-not-allowed"
                 : "bg-bright-sun-500 hover:bg-bright-sun-600"
@@ -131,18 +149,7 @@ const ForgotPassword = () => {
             {loading ? "Sending..." : timer > 0 ? `Resend in ${timer}s` : "Send Reset Link"}
           </button>
         </form>
-
-        {/* ✅ Navigation */}
-        <div className="mt-6 text-sm text-center text-mine-shaft-300 space-y-2">
-          <p className="flex justify-center items-center gap-1">
-            <IconLogin2 size={16} className="text-bright-sun-400" />
-            <Link to="/login" className="text-bright-sun-400 hover:underline">
-              Back to Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 };
 

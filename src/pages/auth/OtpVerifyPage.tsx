@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
 import { resendOTP, verifyOTP } from '../../store/action/user-action';
 import { toast } from '../../../utils/APIClient';
+import AuthShell from '../../components/auth/AuthShell';
 
 const OtpVerifyPage = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -72,13 +73,17 @@ const OtpVerifyPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-mine-shaft-950 flex items-center justify-center px-4">
-            <div className="bg-mine-shaft-900 p-8 rounded-lg shadow-lg w-full max-w-md text-white">
-                <h2 className="text-2xl font-semibold mb-2 text-bright-sun-400 text-center">Verify OTP</h2>
-                <p className="text-center text-sm text-mine-shaft-300 mb-4">
-                    Enter the 6-digit OTP sent to <span className="text-bright-sun-400">{userData?.email}</span>
-                </p>
-
+        <AuthShell
+            title="Verify your email"
+            subtitle={`Enter the 6-digit OTP sent to ${userData?.email || 'your email address'}.`}
+            asideTitle="One quick verification step"
+            asideDescription="OTP verification helps secure your account before you begin creating questions and quiz workflows."
+            asidePoints={[
+                'OTP is valid only for a short time',
+                'You can request a fresh code after expiry',
+                'Verification completes your account setup',
+            ]}
+        >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="text-center">
                         <PinInput
@@ -125,15 +130,15 @@ const OtpVerifyPage = () => {
                     <Button
                         type="submit"
                         fullWidth
+                        size="md"
                         leftSection={<IconKey size={18} />}
                         disabled={otp.length !== 6}
-                        className="bg-bright-sun-500 hover:bg-bright-sun-600 transition-colors"
+                        className="bg-bright-sun-500 hover:bg-bright-sun-600 transition-colors rounded-xl"
                     >
                         Verify OTP
                     </Button>
                 </form>
-            </div>
-        </div>
+        </AuthShell>
     );
 };
 

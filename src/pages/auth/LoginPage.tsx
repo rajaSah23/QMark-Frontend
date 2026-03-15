@@ -15,6 +15,9 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../store';
 import { loginUser } from '../../store/action/user-action';
+import AuthShell from '../../components/auth/AuthShell';
+
+const inputClassName = 'w-full rounded-xl border bg-mine-shaft-800/90 py-3 pl-11 pr-4 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-bright-sun-500';
 
 // ✅ Validation Schema
 const schema = yup.object().shape({
@@ -55,25 +58,37 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-mine-shaft-950 flex items-center justify-center px-4 py-6">
-          <div className="bg-mine-shaft-900 rounded-lg shadow-lg w-full max-w-5xl flex flex-col md:flex-row text-white overflow-hidden">
-            {/* ✅ Image Section – visible on all screens */}
-            <div className="flex justify-center items-center p-6 bg-mine-shaft-800">
-              <img
-                src="/signin-banner.png"
-                alt="Banner"
-                className="w-72 sm:w-80 md:w-96 lg:w-[420px]"
-              />
+        <AuthShell
+          title="Welcome back"
+          subtitle="Sign in to continue your question practice, quiz attempts, and revision flow."
+          asideTitle="A focused study workflow"
+          asideDescription="QMark keeps your preparation cleaner by bringing saved questions, quiz attempts, and performance signals into one place."
+          asidePoints={[
+            'Save and revisit important MCQs',
+            'Attempt quizzes with structured review flow',
+            'Track learning patterns over time',
+          ]}
+          footer={
+            <div className="space-y-2 text-sm text-center text-mine-shaft-300">
+              <p className="flex justify-center items-center gap-1">
+                <IconKey size={16} className="text-bright-sun-400" />
+                <Link to="/forgot-password" className="text-bright-sun-400 hover:underline">
+                  Forgot Password?
+                </Link>
+              </p>
+              <p className="flex justify-center items-center gap-1">
+                <IconUserPlus size={16} className="text-bright-sun-400" />
+                <span>
+                  Don't have an account?{' '}
+                  <Link to="/register" className="text-bright-sun-400 hover:underline">Register</Link>
+                </span>
+              </p>
             </div>
-      
-            {/* ✅ Login Form Section */}
-            <div className="flex-1 p-6 md:p-8">
-              <h2 className="text-2xl font-semibold mb-6 text-bright-sun-400 text-center">Login</h2>
-      
+          }
+        >
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block mb-1 text-sm text-mine-shaft-200">Email</label>
+                  <label htmlFor="email" className="mb-1 block text-sm text-mine-shaft-200">Email</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-3 flex items-center text-mine-shaft-400">
                       <IconMail size={18} />
@@ -83,18 +98,14 @@ const LoginPage = () => {
                       id="email"
                       placeholder="you@example.com"
                       {...register('email')}
-                      className={`w-full pl-10 pr-4 py-2 rounded bg-mine-shaft-800 text-white border ${errors.email ? 'border-red-500' : 'border-mine-shaft-700'
-                        } focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.email ? 'border-red-500' : 'border-mine-shaft-700'}`}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-                  )}
+                  {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                 </div>
-      
-                {/* Password Field */}
+
                 <div>
-                  <label htmlFor="password" className="block mb-1 text-sm text-mine-shaft-200">Password</label>
+                  <label htmlFor="password" className="mb-1 block text-sm text-mine-shaft-200">Password</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-3 flex items-center text-mine-shaft-400">
                       <IconLock size={18} />
@@ -104,8 +115,7 @@ const LoginPage = () => {
                       id="password"
                       placeholder="••••••••"
                       {...register('password')}
-                      className={`w-full pl-10 pr-10 py-2 rounded bg-mine-shaft-800 text-white border ${errors.password ? 'border-red-500' : 'border-mine-shaft-700'
-                        } focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                      className={`${inputClassName} ${errors.password ? 'border-red-500' : 'border-mine-shaft-700'} pr-10`}
                     />
                     <button
                       type="button"
@@ -116,16 +126,13 @@ const LoginPage = () => {
                       {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-                  )}
+                  {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
                 </div>
-      
-                {/* Submit Button */}
+
                 <button
                   type="submit"
                   disabled={!isValid || isSubmitting || loading}
-                  className={`w-full flex items-center justify-center gap-2 text-white py-2 rounded transition-colors ${!isValid || isSubmitting || loading
+                  className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 text-white transition-colors ${!isValid || isSubmitting || loading
                     ? 'bg-mine-shaft-700 cursor-not-allowed'
                     : 'bg-bright-sun-500 hover:bg-bright-sun-600'
                     }`}
@@ -134,26 +141,7 @@ const LoginPage = () => {
                   {loading ? "please wait..." : "Login"}
                 </button>
               </form>
-      
-              {/* Links */}
-              <div className="mt-4 text-sm text-center text-mine-shaft-300 space-y-2">
-                <p className="flex justify-center items-center gap-1">
-                  <IconKey size={16} className="text-bright-sun-400" />
-                  <Link to="/forgot-password" className="text-bright-sun-400 hover:underline">
-                    Forgot Password?
-                  </Link>
-                </p>
-                <p className="flex justify-center items-center gap-1">
-                  <IconUserPlus size={16} className="text-bright-sun-400" />
-                  <span>
-                    Don't have an account?{' '}
-                    <Link to="/register" className="text-bright-sun-400 hover:underline">Register</Link>
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </AuthShell>
       );
       
 };

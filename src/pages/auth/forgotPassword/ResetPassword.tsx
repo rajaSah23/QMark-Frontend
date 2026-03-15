@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { AppDispatch } from "../../../store";
 import { resetPassword } from "../../../store/action/user-action";
+import AuthShell from "../../../components/auth/AuthShell";
 // import { resetPassword } from "../../../store/action/user-action"; ✅ use your real action
 // import toaster from "@/utils/toast"; ✅ your own toast handler
 
@@ -23,6 +24,8 @@ type ResetPasswordFormData = {
   password: string;
   confirmPassword: string;
 };
+
+const inputClassName = 'w-full rounded-xl border bg-mine-shaft-800/90 py-3 pl-11 pr-4 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-bright-sun-500';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -59,14 +62,18 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mine-shaft-950 flex items-center justify-center px-4">
-      <div className="bg-mine-shaft-900 p-8 rounded-lg shadow-lg w-full max-w-md text-white">
-        <h2 className="text-2xl font-semibold mb-6 text-bright-sun-400 text-center">
-          Reset Password
-        </h2>
-
+    <AuthShell
+      title="Reset your password"
+      subtitle="Choose a new password to secure your account and return to your workspace."
+      asideTitle="Keep your account protected"
+      asideDescription="Use a strong password so your questions, bookmarks, and quiz history remain secure."
+      asidePoints={[
+        'Use a password you do not reuse elsewhere',
+        'Keep it memorable but hard to guess',
+        'You will be redirected back to login after reset',
+      ]}
+    >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* ✅ Password Field */}
           <div>
             <label htmlFor="password" className="block mb-1 text-sm text-mine-shaft-200">
               New Password
@@ -81,9 +88,9 @@ const ResetPassword = () => {
                 placeholder="••••••••"
                 {...register("password")}
                 disabled={loading}
-                className={`w-full pl-10 pr-10 py-2 rounded bg-mine-shaft-800 text-white border ${
+                className={`${inputClassName} ${
                   errors.password ? "border-red-500" : "border-mine-shaft-700"
-                } focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                } pr-10`}
               />
               <button
                 type="button"
@@ -98,7 +105,6 @@ const ResetPassword = () => {
             )}
           </div>
 
-          {/* ✅ Confirm Password Field */}
           <div>
             <label htmlFor="confirmPassword" className="block mb-1 text-sm text-mine-shaft-200">
               Confirm Password
@@ -113,9 +119,9 @@ const ResetPassword = () => {
                 placeholder="••••••••"
                 {...register("confirmPassword")}
                 disabled={loading}
-                className={`w-full pl-10 pr-10 py-2 rounded bg-mine-shaft-800 text-white border ${
+                className={`${inputClassName} ${
                   errors.confirmPassword ? "border-red-500" : "border-mine-shaft-700"
-                } focus:outline-none focus:ring-2 focus:ring-bright-sun-500`}
+                } pr-10`}
               />
               <button
                 type="button"
@@ -130,11 +136,10 @@ const ResetPassword = () => {
             )}
           </div>
 
-          {/* ✅ Submit Button */}
           <button
             type="submit"
             disabled={!isValid || isSubmitting || loading}
-            className={`w-full flex items-center justify-center gap-2 text-white py-2 rounded transition-colors ${
+            className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 text-white transition-colors ${
               !isValid || isSubmitting || loading
                 ? "bg-mine-shaft-700 cursor-not-allowed"
                 : "bg-bright-sun-500 hover:bg-bright-sun-600"
@@ -143,8 +148,7 @@ const ResetPassword = () => {
             {loading ? "Resetting..." : "Reset Password"}
           </button>
         </form>
-      </div>
-    </div>
+    </AuthShell>
   );
 };
 
